@@ -486,9 +486,10 @@ function renderVehs(){
     const price=v.msrp?'<span class="vmsrp">$'+Math.round(v.msrp/1000)+'k</span>':'<span class="vmsrp no-price">—</span>';
     const vin=v.vin?esc(v.vin.slice(0,4))+'…'+esc(v.vin.slice(-4)):'—';
     const url=safeUrl(v.vehicle_url);
-    const onclick=url?'onclick="window.open(''+esc(url)+'','_blank','noopener')"':'';
-    const lk=url?'<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">VIEW →</a>':'<span style="color:#222">—</span>';
-    return '<div class="vr'+(url?' vr-link':'')+'" '+onclick+'>'
+    const lk=url?'<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">VIEW →</a>':'<span style="color:#222">—</span>';
+    const cls='vr'+(url?' vr-link':'');
+    const attrs=url?' data-url="'+esc(url)+'"':'';
+    return '<div class="'+cls+'"'+attrs+'>'
       +'<span class="vvin">'+vin+'</span>'
       +'<span class="vtrim">RAPTOR</span>'
       +'<span class="vdeal">'+esc(v.dealer_name)+'<br><span style="font-size:9px;color:var(--faint)">'+esc(v.dealer_city||'')+'</span></span>'
@@ -498,6 +499,11 @@ function renderVehs(){
       +'</div>';
   }).join('');
   document.getElementById('vehicleList').innerHTML=hdr+rows;
+  // Click handler for rows — data-url attribute drives navigation
+  document.getElementById('vehicleList').onclick=function(e){
+    const row=e.target.closest('[data-url]');
+    if(row&&!e.target.closest('a')) window.open(row.dataset.url,'_blank','noopener');
+  };
 }
 
 function renderMap(){
