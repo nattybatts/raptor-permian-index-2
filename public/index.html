@@ -797,7 +797,10 @@ async function openVehModal(vin, vehicleData){
     const diffStr=diff!=null?(diff>0?'+$'+diff.toLocaleString()+' over MSRP':diff<0?'$'+Math.abs(diff).toLocaleString()+' below MSRP':'At MSRP'):'—';
     const diffClass=diff!=null?(diff>0?'red':diff<0?'green':'dim'):'dim';
 
-    const dom=v.dom||vehicleData.days_on_lot||0;
+    // Calculate days from first_seen_at_date — more accurate than dom
+    // dom counts from when ANY source first saw the VIN, not when dealer listed it
+    const firstSeenDate=v.first_seen_at_date?new Date(v.first_seen_at_date):null;
+    const dom=firstSeenDate?Math.floor((Date.now()-firstSeenDate)/(864e5)):(v.dom||vehicleData.days_on_lot||0);
     const status=v.in_transit?'IN TRANSIT':'ON LOT';
     const statusClass=v.in_transit?'transit':'lot';
     const firstListed=v.first_seen_at_date?new Date(v.first_seen_at_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
