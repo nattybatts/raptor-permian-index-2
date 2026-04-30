@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
   try {
-    const [snapshotsRes, vehiclesRes, allVehiclesRes, donationsRes] = await Promise.all([
+    const [snapshotsRes, vehiclesRes, allVehiclesRes, donationsRes, soldRes] = await Promise.all([
       // Active snapshots for chart
       supabase.from('snapshots')
         .select('snap_date, total, raptor, raptor_r, wti_price, commentary, avg_days_lot')
@@ -29,6 +29,14 @@ export default async function handler(req, res) {
         .select('amount_cents, display_name, message, donated_at')
         .order('donated_at', { ascending: false })
         .limit(20),
+
+      // Recently sold/delisted — inactive vehicles from last 60 days
+      supabase.from('vehicles')
+        .select('vin, model_year, trim, color, msrp, dealer_name, dealer_city, engine_size, first_seen, last_seen, first_listed, days_on_lot, vehicle_url, dealer_url')
+        .eq('active', false)
+        .gte('last_seen', new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+        .order('last_seen', { ascending: false })
+        .limit(50),
     ]);
 
     // Build dealer summary from active vehicles
@@ -85,6 +93,7 @@ export default async function handler(req, res) {
         max:        maxDays,        // longest sitting truck currently
         sampleSize: allDays.length, // total vehicles used for rolling avg
       },
+      recentlySold:  soldRes?.data || [],
       generatedAt: new Date().toISOString(),
     });
 
