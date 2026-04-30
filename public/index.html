@@ -185,6 +185,23 @@ footer a:hover{color:var(--muted)}
   .vmsrp{font-size:16px}
   /* Hide chart on mobile only */
   .chart-section{display:none}
+  /* Reorder donate section on mobile — move below stats */
+  body{display:flex;flex-direction:column}
+  .donate-strip{order:5}
+  header{order:1}
+  .lbanner{order:2}
+  .price-strip{order:3}
+  .friend-bar{order:4}
+  .stats-signal{order:5}
+  .donate-strip{order:6}
+  .days-metrics{order:7}
+  .vehicles-section{order:8}
+  .map-section{order:9}
+  .dealer-section{order:10}
+  .bottom-row{order:11}
+  .status-bar{order:12}
+  footer{order:13}
+  .don-modal{order:99}
   /* Friend bar — hide button, keep text */
   .friend-bar .friend-btn{display:none}
   /* Donate strip — compact on mobile */
