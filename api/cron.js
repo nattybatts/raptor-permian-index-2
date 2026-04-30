@@ -52,6 +52,8 @@ export default async function handler(req, res) {
       dealer_state: v.dealer_state || 'TX',
       dealer_url:   v.dealer_url   || null,
       vehicle_url:  v.vehicle_url  || null,
+      dealer_lat:   v.dealer_lat   || null,
+      dealer_lng:   v.dealer_lng   || null,
       first_seen:   today,
       last_seen:    today,
       active:       true,
