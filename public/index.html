@@ -137,17 +137,29 @@ footer a:hover{color:var(--muted)}
 @media(max-width:680px){
   .bottom-row{grid-template-columns:1fr}
   .sn{font-size:56px}
-  header,.price-strip,.chart-section,.vehicles-section,.dealer-section,.pane,.donate-strip{padding:10px 14px}
-  .vr{grid-template-columns:75px 72px 1fr 80px}
-  .vdays,.vlink,.vvin{display:none}
-  .dealer-table th:last-child,.dt-bar-bg{display:none}
+  header,.price-strip,.vehicles-section,.dealer-section,.pane,.donate-strip,.stats-signal,.signal-card,.chart-section,.map-section{padding:10px 14px}
+  /* Vehicle rows: just TRIM | DEALER | PRICE on mobile */
+  .vr{grid-template-columns:70px 1fr auto;gap:6px;padding:10px 14px}
+  .vdays,.vlink,.vvin,.vh span:nth-child(1),.vh span:nth-child(5),.vh span:nth-child(6){display:none}
+  .vh{grid-template-columns:70px 1fr auto}
+  .vmsrp{font-size:16px}
+  /* Hide heavy sections on mobile */
   .chart-section{display:none}
   .dealer-section{display:none}
+  .map-section{display:none}
   .bottom-row{display:none}
+  /* Friend bar — hide button, keep text */
   .friend-bar .friend-btn{display:none}
-  .donate-strip-inner{gap:8px}
+  /* Donate strip — stack vertically */
+  .donate-strip-inner{flex-direction:column;align-items:stretch;gap:10px}
+  .dt-label{font-size:13px}
+  .amts{justify-content:flex-start}
   .dt-fields{flex-direction:column;align-items:stretch}
-  .paybtn{width:100%}
+  .dt-input,.paybtn{width:100%}
+  /* Signal bar — tighten */
+  .stats-signal{gap:12px}
+  .sig-divider{display:none}
+  .sig-wrap{min-width:100%;order:3}
 }
 </style>
 </head>
