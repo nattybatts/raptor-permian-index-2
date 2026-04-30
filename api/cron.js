@@ -68,6 +68,10 @@ export default async function handler(req, res) {
       dealer_lat:      v.dealer_lat       || null,
       dealer_lng:      v.dealer_lng       || null,
       days_on_lot:     v.days_on_lot      || 0,
+      in_transit:      v.in_transit       || false,
+      vehicle_status:  v.vehicle_status   || null,
+      engine_size:     v.engine_size      || null,
+      interior_color:  v.interior_color   || null,
       days_on_lot_180: v.days_on_lot_180  || v.days_on_lot || 0,
       first_listed:    v.first_listed     || null,
       // Preserve original first_seen if we've seen this VIN before
