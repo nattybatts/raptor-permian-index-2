@@ -559,6 +559,36 @@ async function doDonate(){
 }
 
 loadData();
+
+// ── LIVE OIL PRICE ────────────────────────────────────────
+// Fetches from OilPriceAPI on page load, but only if 15+ minutes
+// have passed since last fetch. Uses localStorage to track timing.
+// No API key exposed — OIL_PRICE_API_KEY is server-side only.
+// We route through our own /api/oil endpoint to keep the key hidden.
+const OIL_CACHE_KEY = 'wti_last_fetch';
+const OIL_TTL_MS    = 15 * 60 * 1000; // 15 minutes
+
+async function fetchLiveOil() {
+  const lastFetch = parseInt(localStorage.getItem(OIL_CACHE_KEY) || '0');
+  const now       = Date.now();
+  if (now - lastFetch < OIL_TTL_MS) return; // skip — fetched recently
+
+  try {
+    const r = await fetch('/api/oil');
+    if (!r.ok) return;
+    const d = await r.json();
+    if (!d.price || d.price < 10) return;
+
+    // Update display
+    document.getElementById('wtiV').textContent = '$' + d.price.toFixed(2);
+    document.getElementById('brtV').textContent = '$' + (d.price + 2.5).toFixed(2);
+
+    // Record fetch time
+    localStorage.setItem(OIL_CACHE_KEY, String(now));
+  } catch {}
+}
+
+fetchLiveOil();
 </script>
 </body>
 </html>
