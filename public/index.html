@@ -213,6 +213,26 @@ header{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 2
 .bottom-row{display:grid;grid-template-columns:1fr 1fr;background:var(--border);gap:1px;border-bottom:1px solid var(--border)}
 .pane{background:var(--bg0);padding:16px 20px}
 .cq{font-size:12px;color:#999;line-height:1.8;font-style:italic;border-left:2px solid var(--gold-dim);padding-left:12px;margin-top:8px}
+.alerts-section{background:var(--bg0);padding:16px 20px;border-bottom:1px solid var(--border)}
+.alerts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 12px}
+.alert-card{background:var(--bg1);border:1px solid var(--border2);padding:12px;cursor:pointer;transition:all .15s;display:block}
+.alert-card:hover{border-color:var(--gold-dim)}
+.alert-card.selected{border-color:var(--gold);background:#1a1100}
+.ac-icon{font-size:18px;margin-bottom:4px}
+.ac-title{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--gold);margin-bottom:4px}
+.ac-desc{font-size:10px;color:var(--muted);line-height:1.4}
+.ac-extra{margin-top:8px}
+.alerts-form{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.alert-input{background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:10px;padding:7px 10px;outline:none;flex:1;min-width:120px}
+.alert-input:focus{border-color:var(--gold-dim)}
+.alert-input::placeholder{color:var(--faint)}
+.alert-btn{background:var(--gold-dim);border:none;color:#000;font-family:var(--mono);font-size:10px;font-weight:700;padding:8px 14px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;transition:background .15s}
+.alert-btn:hover{background:var(--gold)}
+.alert-btn:disabled{opacity:.4;cursor:not-allowed}
+.alert-msg{margin-top:8px;font-size:11px}
+.alert-msg.ok{color:var(--green)}
+.alert-msg.err{color:var(--red)}
+@media(max-width:680px){.alerts-grid{grid-template-columns:1fr}.alerts-form{flex-direction:column}.alert-input,.alert-btn{width:100%}}
 .stbl{margin-top:12px;width:100%;border-collapse:collapse}
 .stbl td{padding:4px 0;font-size:10px;color:var(--faint);border-bottom:1px solid #111}
 .stbl td:last-child{text-align:right;color:var(--dim)}
@@ -472,6 +492,40 @@ footer a:hover{color:var(--muted)}
   </div>
 </div>
 
+<div class="alerts-section">
+  <div class="section-label">🔔 Get Notified — Free Email Alerts</div>
+  <div class="alerts-grid">
+    <label class="alert-card" onclick="selectAlert(this,'sold')">
+      <input type="radio" name="atype" value="sold" style="display:none">
+      <div class="ac-icon">🔴</div>
+      <div class="ac-title">RAPTOR SOLD</div>
+      <div class="ac-desc">Alert when any Raptor disappears from inventory</div>
+    </label>
+    <label class="alert-card" onclick="selectAlert(this,'days')">
+      <input type="radio" name="atype" value="days" style="display:none">
+      <div class="ac-icon">⏱</div>
+      <div class="ac-title">SITTING TOO LONG</div>
+      <div class="ac-desc">Alert when a truck hits your target days on lot</div>
+      <div class="ac-extra" id="daysExtra" style="display:none">
+        <input class="alert-input" id="daysThresh" type="number" value="30" min="7" max="365" placeholder="Days" onclick="event.stopPropagation()" style="width:70px">
+        <span style="font-size:10px;color:var(--muted)">days</span>
+      </div>
+    </label>
+    <label class="alert-card" onclick="selectAlert(this,'price')">
+      <input type="radio" name="atype" value="price" style="display:none">
+      <div class="ac-icon">💰</div>
+      <div class="ac-title">PRICE DROP</div>
+      <div class="ac-desc">Alert when any Raptor drops in price</div>
+    </label>
+  </div>
+  <div class="alerts-form">
+    <input class="alert-input" id="alertEmail" type="email" placeholder="your@email.com" autocomplete="email">
+    <input class="alert-input" id="alertVin" type="text" placeholder="VIN (optional — leave blank for any Raptor)" maxlength="17" style="flex:2">
+    <button class="alert-btn" onclick="submitAlert()">SET ALERT →</button>
+  </div>
+  <div class="alert-msg" id="alertMsg"></div>
+</div>
+
 <div class="status-bar">
   <span class="smsg" id="smsg">Loading inventory data...</span>
   <span id="dtrk" style="color:var(--faint);white-space:nowrap"></span>
@@ -504,6 +558,51 @@ footer a:hover{color:var(--muted)}
 'use strict';
 let snaps=[],vehs=[],dlrs=[],dons=[],dAmt=500,tc=null;
 document.getElementById('yr').textContent=new Date().getFullYear();
+
+function selectAlert(card, type){
+  document.querySelectorAll('.alert-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  document.getElementById('daysExtra').style.display = type==='days' ? 'block' : 'none';
+}
+
+async function submitAlert(){
+  const email = document.getElementById('alertEmail').value.trim();
+  const vin   = document.getElementById('alertVin').value.trim().toUpperCase() || null;
+  const selected = document.querySelector('.alert-card.selected');
+  const msg   = document.getElementById('alertMsg');
+
+  if(!email){msg.className='alert-msg err';msg.textContent='Email required.';return;}
+  if(!selected){msg.className='alert-msg err';msg.textContent='Select an alert type.';return;}
+
+  const alert_type = selected.querySelector('input').value;
+  const threshold  = alert_type==='days' ? parseInt(document.getElementById('daysThresh').value)||30 : null;
+
+  const btn = document.querySelector('.alert-btn');
+  btn.disabled=true;btn.textContent='SAVING...';
+  msg.textContent='';
+
+  try{
+    const r = await fetch('/api/subscribe',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email, alert_type, vin, threshold})
+    });
+    const d = await r.json();
+    if(d.ok){
+      msg.className='alert-msg ok';
+      msg.textContent='✓ Subscribed! Check your email for confirmation.';
+      document.getElementById('alertEmail').value='';
+      document.getElementById('alertVin').value='';
+    } else {
+      msg.className='alert-msg err';
+      msg.textContent=d.error||'Something went wrong.';
+    }
+  }catch(e){
+    msg.className='alert-msg err';
+    msg.textContent='Error: '+e.message;
+  }
+  btn.disabled=false;btn.textContent='SET ALERT →';
+}
 if(new URLSearchParams(location.search).get('donated')==='1'){
   document.getElementById('dsucc').style.display='block';
   history.replaceState({},'','/');
