@@ -81,6 +81,39 @@ header{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 2
 .dt-raised-lbl{font-size:7px;color:var(--faint);letter-spacing:2px;text-transform:uppercase}
 .show-all-btn{background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:1px;margin-top:6px;transition:all .15s}
 .show-all-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+.veh-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1001;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.veh-modal.open{display:flex}
+.veh-modal-inner{background:var(--bg1);border:1px solid var(--border2);width:100%;max-width:900px;margin:auto}
+.veh-modal-header{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);gap:12px}
+.veh-modal-title{font-family:var(--display);font-size:28px;color:var(--gold);letter-spacing:2px;line-height:1}
+.veh-modal-sub{font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:1px}
+.veh-modal-close{background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:12px;padding:6px 10px;cursor:pointer;flex-shrink:0;transition:all .15s}
+.veh-modal-close:hover{border-color:var(--red);color:var(--red)}
+.veh-modal-body{padding:0}
+.vm-loading{padding:40px;text-align:center;color:var(--muted);font-size:12px}
+.vm-photos{display:flex;gap:6px;padding:12px 16px;overflow-x:auto;background:#0a0a0a;border-bottom:1px solid var(--border)}
+.vm-photos img{height:160px;width:auto;flex-shrink:0;border:1px solid var(--border2);cursor:pointer;transition:opacity .15s}
+.vm-photos img:hover{opacity:.8}
+.vm-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+.vm-section{background:var(--bg1);padding:14px 16px}
+.vm-section-title{font-size:8px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px}
+.vm-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid #111;font-size:11px}
+.vm-row:last-child{border-bottom:none}
+.vm-label{color:var(--muted)}
+.vm-val{color:var(--text);text-align:right;font-weight:700}
+.vm-val.gold{color:var(--gold);font-family:var(--display);font-size:18px}
+.vm-val.green{color:var(--green)}
+.vm-val.red{color:var(--red)}
+.vm-val.dim{color:var(--faint)}
+.vm-status{display:inline-block;padding:2px 8px;font-size:9px;letter-spacing:2px;font-weight:700;text-transform:uppercase;border-radius:2px}
+.vm-status.transit{background:#1a1000;color:var(--gold);border:1px solid var(--gold-dim)}
+.vm-status.lot{background:#0a1a0a;color:var(--green);border:1px solid #2a4a2a}
+.vm-actions{padding:12px 16px;display:flex;gap:8px;background:var(--bg0);border-top:1px solid var(--border);flex-wrap:wrap}
+.vm-btn{background:var(--gold-dim);border:none;color:#000;font-family:var(--mono);font-size:10px;font-weight:700;padding:8px 16px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;text-decoration:none;display:inline-block;transition:background .15s}
+.vm-btn:hover{background:var(--gold)}
+.vm-btn.outline{background:transparent;border:1px solid var(--border2);color:var(--muted)}
+.vm-btn.outline:hover{border-color:var(--gold-dim);color:var(--gold)}
+@media(max-width:680px){.vm-grid{grid-template-columns:1fr}.veh-modal{padding:10px}.vm-photos img{height:120px}}
 .don-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;align-items:center;justify-content:center;padding:20px}
 .don-modal.open{display:flex}
 .don-modal-inner{background:var(--bg1);border:1px solid var(--border2);width:100%;max-width:480px;max-height:80vh;display:flex;flex-direction:column}
@@ -390,6 +423,23 @@ footer a:hover{color:var(--muted)}
   <span>Not affiliated with Ford Motor Company</span>
 </footer>
 
+<!-- Vehicle Detail Modal -->
+<div class="veh-modal" id="vehModal" onclick="if(event.target===this)closeVehModal()">
+  <div class="veh-modal-inner">
+    <div class="veh-modal-header">
+      <div>
+        <div class="veh-modal-title" id="vmTitle">2026 FORD F-150 RAPTOR</div>
+        <div class="veh-modal-sub" id="vmSub">Loading...</div>
+      </div>
+      <button class="veh-modal-close" onclick="closeVehModal()">✕</button>
+    </div>
+    <div class="veh-modal-body" id="vmBody">
+      <div class="vm-loading" id="vmLoading">Loading vehicle data...</div>
+    </div>
+  </div>
+</div>
+
+
 <script>
 'use strict';
 let snaps=[],vehs=[],dlrs=[],dons=[],dAmt=500,tc=null;
@@ -503,7 +553,7 @@ function renderVehs(){
     const url=safeUrl(v.vehicle_url);
     const lk=url?'<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">VIEW →</a>':'<span style="color:#222">—</span>';
     const cls='vr'+(url?' vr-link':'');
-    const attrs=url?' data-url="'+esc(url)+'"':'';
+    const attrs=(url?' data-url="'+esc(url)+'"':'')+(v.vin?' data-vin="'+esc(v.vin)+'"':'');
     return '<div class="'+cls+'"'+attrs+'>'
       +'<span class="vvin">'+vin+'</span>'
       +'<span class="vtrim">RAPTOR</span>'
@@ -514,10 +564,16 @@ function renderVehs(){
       +'</div>';
   }).join('');
   document.getElementById('vehicleList').innerHTML=hdr+rows;
-  // Click handler for rows — data-url attribute drives navigation
+  // Click handler — open detail popup, VIEW button still navigates directly
   document.getElementById('vehicleList').onclick=function(e){
+    if(e.target.closest('a')) return; // let VIEW link work normally
     const row=e.target.closest('[data-url]');
-    if(row&&!e.target.closest('a')) window.open(row.dataset.url,'_blank','noopener');
+    if(row){
+      const vin=row.dataset.vin;
+      const vdata=vehs.find(v=>v.vin===vin)||{};
+      if(vin) openVehModal(vin, vdata);
+      else if(row.dataset.url) window.open(row.dataset.url,'_blank','noopener');
+    }
   };
 }
 
@@ -708,6 +764,103 @@ function showAllDonations(){
 
 function closeDonModal(){
   document.getElementById('donModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// Vehicle detail popup
+async function openVehModal(vin, vehicleData){
+  const modal=document.getElementById('vehModal');
+  const body=document.getElementById('vmBody');
+  const title=document.getElementById('vmTitle');
+  const sub=document.getElementById('vmSub');
+
+  // Show modal immediately with data we already have
+  title.textContent=(vehicleData.model_year||'2026')+' FORD F-150 RAPTOR';
+  sub.textContent=esc(vehicleData.dealer_name||'')+' · '+esc(vehicleData.dealer_city||'');
+  body.innerHTML='<div class="vm-loading">Loading vehicle details...</div>';
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
+
+  try{
+    // Fetch live data from Marketcheck via our API
+    const r=await fetch('/api/vehicle?vin='+encodeURIComponent(vin));
+    const d=await r.json();
+    const v=d.listing||{};
+    const build=v.build||{};
+    const dealer=v.dealer||{};
+    const photos=(v.media?.photo_links||[]).slice(0,10);
+
+    // Price analysis
+    const price=v.price||vehicleData.msrp||null;
+    const msrp=v.msrp||vehicleData.msrp||null;
+    const diff=price&&msrp?price-msrp:null;
+    const diffStr=diff!=null?(diff>0?'+$'+diff.toLocaleString()+' over MSRP':diff<0?'$'+Math.abs(diff).toLocaleString()+' below MSRP':'At MSRP'):'—';
+    const diffClass=diff!=null?(diff>0?'red':diff<0?'green':'dim'):'dim';
+
+    const dom=v.dom||vehicleData.days_on_lot||0;
+    const status=v.in_transit?'IN TRANSIT':'ON LOT';
+    const statusClass=v.in_transit?'transit':'lot';
+    const firstListed=v.first_seen_at_date?new Date(v.first_seen_at_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+
+    const photoHtml=photos.length
+      ?'<div class="vm-photos">'+photos.map(p=>'<img src="'+esc(p)+'" loading="lazy" alt="Raptor photo">').join('')+'</div>'
+      :'';
+
+    body.innerHTML=photoHtml+
+      '<div class="vm-grid">'+
+        '<div class="vm-section">'+
+          '<div class="vm-section-title">Pricing</div>'+
+          '<div class="vm-row"><span class="vm-label">Price</span><span class="vm-val gold">'+(price?'$'+price.toLocaleString():'—')+'</span></div>'+
+          '<div class="vm-row"><span class="vm-label">MSRP</span><span class="vm-val">'+(msrp?'$'+msrp.toLocaleString():'—')+'</span></div>'+
+          '<div class="vm-row"><span class="vm-label">vs MSRP</span><span class="vm-val '+diffClass+'">'+diffStr+'</span></div>'+
+        '</div>'+
+        '<div class="vm-section">'+
+          '<div class="vm-section-title">Inventory Status</div>'+
+          '<div class="vm-row"><span class="vm-label">Status</span><span class="vm-val"><span class="vm-status '+statusClass+'">'+status+'</span></span></div>'+
+          '<div class="vm-row"><span class="vm-label">'+(v.in_transit?'Days Listed':'Days on Lot')+'</span><span class="vm-val">'+(dom||'0')+' days'+(v.in_transit?' (not yet on lot)':'')+'</span></div>'+
+          '<div class="vm-row"><span class="vm-label">First Listed</span><span class="vm-val">'+firstListed+'</span></div>'+
+        '</div>'+
+        '<div class="vm-section">'+
+          '<div class="vm-section-title">Exterior & Interior</div>'+
+          '<div class="vm-row"><span class="vm-label">Exterior</span><span class="vm-val">'+esc(v.exterior_color||vehicleData.color||'—')+'</span></div>'+
+          '<div class="vm-row"><span class="vm-label">Interior</span><span class="vm-val">'+esc(v.interior_color||'—')+'</span></div>'+
+          '<div class="vm-row"><span class="vm-label">VIN</span><span class="vm-val" style="font-size:9px;letter-spacing:1px">'+esc(vin)+'</span></div>'+
+        '</div>'+
+        '<div class="vm-section">'+
+          '<div class="vm-section-title">Powertrain & Specs</div>'+
+          '<div class="vm-row"><span class="vm-label">Engine</span><span class="vm-val">'+esc(build.engine||'—')+'</span></div>'+
+          '<div class="vm-row"><span class="vm-label">Drivetrain</span><span class="vm-val">'+esc(build.drivetrain||'4WD')+'</span></div>'+
+          '<div class="vm-row"><span class="vm-label">Transmission</span><span class="vm-val">'+esc(build.transmission||'—')+'</span></div>'+
+          '<div class="vm-row"><span class="vm-label">Fuel Economy</span><span class="vm-val">'+(build.city_mpg?build.city_mpg+' city / '+build.highway_mpg+' hwy':'—')+'</span></div>'+
+        '</div>'+
+        '<div class="vm-section">'+
+          '<div class="vm-section-title">Dealer</div>'+
+          '<div class="vm-row"><span class="vm-label">Name</span><span class="vm-val">'+esc(dealer.name||vehicleData.dealer_name||'—')+'</span></div>'+
+          '<div class="vm-row"><span class="vm-label">City</span><span class="vm-val">'+esc(dealer.city||vehicleData.dealer_city||'—')+', '+esc(dealer.state||'TX')+'</span></div>'+
+          (dealer.phone?'<div class="vm-row"><span class="vm-label">Phone</span><span class="vm-val"><a href="tel:'+esc(dealer.phone)+'" style="color:var(--gold)">'+esc(dealer.phone)+'</a></span></div>':'')+
+          (dealer.street?'<div class="vm-row"><span class="vm-label">Address</span><span class="vm-val" style="font-size:10px">'+esc(dealer.street)+'</span></div>':'')+
+        '</div>'+
+        '<div class="vm-section">'+
+          '<div class="vm-section-title">Body</div>'+
+          '<div class="vm-row"><span class="vm-label">Body</span><span class="vm-val">'+esc(build.body_subtype||'Crew')+' Cab</span></div>'+
+          '<div class="vm-row"><span class="vm-label">Doors</span><span class="vm-val">'+(build.doors||4)+'</span></div>'+
+          '<div class="vm-row"><span class="vm-label">Made In</span><span class="vm-val">'+esc(build.made_in||'USA')+'</span></div>'+
+          '<div class="vm-row"><span class="vm-label">Model Year</span><span class="vm-val">'+(build.year||vehicleData.model_year||2026)+'</span></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="vm-actions">'+
+        (safeUrl(vehicleData.vehicle_url)?'<a class="vm-btn" href="'+esc(vehicleData.vehicle_url)+'" target="_blank" rel="noopener">VIEW AT DEALER →</a>':'')+''+
+        (dealer.phone?'<a class="vm-btn outline" href="tel:'+esc(dealer.phone)+'">CALL DEALER</a>':'')+
+        '<button class="vm-btn outline" onclick="closeVehModal()">CLOSE</button>'+
+      '</div>';
+
+  }catch(e){
+    body.innerHTML='<div class="vm-loading">Error loading details: '+esc(e.message)+'</div>';
+  }
+}
+
+function closeVehModal(){
+  document.getElementById('vehModal').classList.remove('open');
   document.body.style.overflow='';
 }
 
