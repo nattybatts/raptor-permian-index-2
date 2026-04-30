@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Permian Raptor Index</title>
-<meta name="description" content="Daily Ford Raptor inventory tracker across all dealerships within 150 miles of Midland TX. Low stock = boom. High stock = bust.">
-<meta property="og:title" content="Permian Raptor Index — Midland OFS Health Monitor">
-<meta property="og:description" content="Low inventory = roughnecks are flush. High inventory = repo man's coming. Every dealer. Updated daily.">
+<title>Permian Raptor Index — Midland OFS Health Monitor</title>
+<meta name="description" content="Daily F-150 Raptor inventory tracker across all Ford dealers within 150 miles of Midland TX. Low stock = boom. High stock = bust.">
+<meta property="og:title" content="Permian Raptor Index">
+<meta property="og:description" content="Low inventory = roughnecks are flush. High inventory = repo man's coming. Updated daily.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -14,278 +14,240 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --gold:#f0a500;--gold-dim:#c8860a;--red:#e05555;--green:#4caf50;
-  --bg0:#060606;--bg1:#0d0d0d;--bg2:#111;--border:#1e1e1e;--border2:#2a2a2a;
-  --text:#e0d8c4;--muted:#666;--dim:#333;
+  --bg0:#0a0a0a;--bg1:#111;--bg2:#181818;--border:#242424;--border2:#333;
+  --text:#e8e0cc;--muted:#888;--dim:#555;--faint:#3a3a3a;
   --mono:'JetBrains Mono','Courier New',monospace;--display:'Bebas Neue',Impact,sans-serif;
 }
 body{background:var(--bg0);color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.5;min-height:100vh}
-body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.03) 3px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:999}
-header{background:#100c00;border-bottom:2px solid var(--gold-dim);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.logo{display:flex;align-items:baseline;gap:14px}
-.logo-title{font-family:var(--display);font-size:32px;color:var(--gold);letter-spacing:3px;line-height:1}
-.logo-sub{font-size:9px;color:var(--muted);letter-spacing:4px;text-transform:uppercase}
-.live-badge{display:flex;align-items:center;gap:7px;background:#170808;border:1px solid #6b1a1a;color:var(--red);font-size:9px;padding:5px 11px;letter-spacing:2px}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.025) 3px,rgba(0,0,0,.025) 4px);pointer-events:none;z-index:999}
+
+/* HEADER */
+header{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.logo-title{font-family:var(--display);font-size:30px;color:var(--gold);letter-spacing:3px;line-height:1}
+.logo-sub{font-size:9px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:2px}
+.live-badge{display:flex;align-items:center;gap:7px;background:#1a0808;border:1px solid #6b1a1a;color:var(--red);font-size:9px;padding:5px 11px;letter-spacing:2px;white-space:nowrap}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:blink 1.4s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.sponsor-bar{background:#0a0800;border-bottom:1px solid #1a1400;padding:6px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.sp-lbl{font-size:8px;color:#3a3020;letter-spacing:3px;text-transform:uppercase}
-.sp-link{color:var(--gold-dim);text-decoration:none;font-size:11px;border-bottom:1px solid #3a2a00}
-.sp-link:hover{color:var(--gold)}
-.price-strip{background:var(--bg1);border-bottom:1px solid var(--border);padding:8px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+
+
+
+/* FRIEND CALLOUT */
+.friend-bar{background:#080d08;border-bottom:1px solid #1a2a1a;padding:7px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.friend-text{font-size:11px;color:#6a9a6a}
+.friend-text a{color:#5caf5c;text-decoration:none;font-weight:700}
+.friend-text a:hover{color:#7fcf7f;text-decoration:underline}
+.friend-btn{background:transparent;border:1px solid #2a4a2a;color:#5caf5c;font-family:var(--mono);font-size:9px;padding:5px 12px;text-decoration:none;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;transition:all .15s}
+.friend-btn:hover{background:#0d1f0d;border-color:#5caf5c}
+
+/* PRICE STRIP */
+.price-strip{background:var(--bg1);border-bottom:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .pb{display:flex;align-items:baseline;gap:8px}
-.pl{font-size:8px;color:var(--muted);letter-spacing:3px;text-transform:uppercase}
-.pv{font-family:var(--display);font-size:24px;color:var(--gold)}
-.pc{font-size:10px}.pc.up{color:var(--green)}.pc.dn{color:var(--red)}
-.vsep{color:var(--dim)}
+.pl{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+.pv{font-family:var(--display);font-size:26px;color:var(--gold)}
+.vsep{color:var(--faint)}
 .frow{margin-left:auto;display:flex}
-.fb{background:transparent;border:1px solid var(--border2);border-right:none;color:var(--muted);font-family:var(--mono);font-size:9px;padding:5px 12px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .12s}
+.fb{background:transparent;border:1px solid var(--border2);border-right:none;color:var(--dim);font-family:var(--mono);font-size:9px;padding:5px 12px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .12s}
 .fb:last-child{border-right:1px solid var(--border2)}
 .fb.on{background:#1a1100;color:var(--gold);border-color:var(--gold-dim)}
-.fb:hover:not(.on){background:#181818;color:#aaa}
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
-.sc{background:var(--bg1);padding:20px 24px}
-.sl{font-size:8px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
-.sn{font-family:var(--display);font-size:58px;line-height:1;color:var(--gold)}
-.ss{font-size:10px;margin-top:5px}.ss.up{color:var(--green)}.ss.dn{color:var(--red)}.ss.fl{color:var(--muted)}
-.signal-card{background:var(--bg1);padding:14px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.sig-lbl{font-size:8px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;white-space:nowrap}
-.sig-wrap{flex:1;min-width:200px}
-.sig-ends{display:flex;justify-content:space-between;font-size:8px;color:#2a2a2a;letter-spacing:1px;margin-bottom:5px}
-.sig-bg{height:10px;background:#181818;border-radius:5px;overflow:hidden}
-.sig-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#1e5c20,#c8860a,#7a1a1a);transition:width 1s ease}
-.sig-txt{font-size:11px;color:var(--muted);margin-top:6px}
-.chart-section{background:var(--bg1);padding:16px 24px;border-bottom:1px solid var(--border)}
-.section-label{font-size:8px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px}
-.cleg{display:flex;gap:18px;margin-bottom:10px}
-.cli{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--muted)}
-.cll{width:18px;height:2px;border-radius:1px}
- 
-/* VEHICLES TABLE */
-.vehicles-section{background:var(--bg0);padding:16px 24px;border-bottom:1px solid var(--border)}
-.trow{display:flex;gap:0;margin-bottom:14px;flex-wrap:wrap;gap:4px}
-.tb{background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:9px;padding:5px 14px;cursor:pointer;letter-spacing:1px;text-transform:uppercase}
-.tb.on{background:var(--bg2);color:var(--text);border-color:#3a3a3a}
-#vehicleList{display:flex;flex-direction:column;gap:1px}
-.vr{background:var(--bg1);display:grid;grid-template-columns:90px 80px 1fr 100px 80px 90px;align-items:center;gap:8px;padding:10px 14px;font-size:10px;color:#888;border-left:3px solid transparent;transition:all .15s}
-.vr:hover{border-left-color:var(--gold-dim);background:#0f0f0f}
-.vr.isR{border-left-color:#5a1a1a}
-.vvin{font-family:var(--mono);font-size:9px;color:#444;letter-spacing:1px}
-.vtrim{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px}
-.vtrim.r{color:#ff6b6b;background:#1a0808;border:1px solid #3a1a1a}
-.vtrim.b{color:var(--gold);background:#1a1000;border:1px solid #3a2a00}
-.vdeal{color:#777;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px}
-.vmsrp{text-align:right;font-family:var(--display);font-size:20px}
-.vmsrp.has-price{color:var(--gold)}
-.vmsrp.no-price{color:#333;font-size:14px}
-.vdays{color:#444;text-align:right;font-size:9px}
-.vlink a{display:inline-block;background:transparent;border:1px solid var(--border2);color:#555;font-size:8px;padding:4px 8px;text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:all .15s;white-space:nowrap}
-.vlink a:hover{border-color:var(--gold-dim);color:var(--gold);background:#1a1100}
-.vh{background:var(--bg0)!important;border-left:3px solid transparent!important;color:#2a2a2a!important;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:6px 14px!important}
-.vh:hover{border-left-color:transparent!important;background:var(--bg0)!important}
-.no-vehicles{color:#333;font-size:11px;padding:20px 0;text-align:center;font-style:italic}
- 
-/* DEALER TABLE */
-.dealer-section{background:var(--bg0);padding:16px 24px;border-bottom:1px solid var(--border)}
-.dealer-table{width:100%;border-collapse:collapse;margin-top:4px}
-.dealer-table th{font-size:8px;color:#2a2a2a;letter-spacing:2px;text-transform:uppercase;padding:6px 10px;text-align:left;border-bottom:1px solid #111}
-.dealer-table th:last-child,.dealer-table th:nth-child(4),.dealer-table th:nth-child(5){text-align:right}
-.dt-row{border-bottom:1px solid #0d0d0d;transition:background .1s}
-.dt-row:hover{background:#0d0d0d}
-.dt-row td{padding:9px 10px;font-size:11px;vertical-align:middle}
-.dt-name a{color:#888;text-decoration:none}
-.dt-name a:hover{color:var(--gold)}
-.dt-name.zero a{color:#333}
-.dt-city{color:#444;font-size:10px}
-.dt-miles{color:#2a2a2a;font-size:9px;text-align:right}
-.dt-raptor{text-align:right;font-family:var(--display);font-size:22px;color:var(--gold-dim)}
-.dt-raptor.zero{color:#222}
-.dt-raptorR{text-align:right;font-family:var(--display);font-size:22px;color:var(--red)}
-.dt-raptorR.zero{color:#222}
-.dt-total{text-align:right;font-family:var(--display);font-size:26px;color:var(--gold)}
-.dt-total.zero{color:#1a1a1a}
-.dt-bar-cell{width:80px}
-.dt-bar-bg{height:3px;background:#111;border-radius:2px;overflow:hidden}
-.dt-bar-fill{height:100%;background:var(--gold-dim);border-radius:2px}
- 
-/* BOTTOM */
-.bottom-row{display:grid;grid-template-columns:1fr 1fr;background:var(--border);gap:1px;border-bottom:1px solid var(--border)}
-.pane{background:var(--bg0);padding:18px 24px}
-.cq{font-size:12px;color:#777;line-height:1.9;font-style:italic;border-left:2px solid var(--gold-dim);padding-left:14px;margin-top:10px}
-.stbl{margin-top:14px;width:100%;border-collapse:collapse}
-.stbl td{padding:4px 0;font-size:9px;color:#3a3a3a;border-bottom:1px solid #0f0f0f}
-.stbl td:last-child{text-align:right;color:var(--dim)}
- 
-/* DONATE */
-.donate-section{background:#080600;border-bottom:1px solid var(--border);padding:20px 24px}
-.dh{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-.dtitle{font-family:var(--display);font-size:22px;color:var(--gold);letter-spacing:2px;line-height:1.1}
-.dsub{font-size:10px;color:var(--muted);margin-top:4px}
-.dtotal{font-family:var(--display);font-size:28px;color:var(--gold-dim);text-align:right}
-.dtlbl{font-size:8px;color:#3a3020;letter-spacing:2px;display:block;text-align:right;margin-top:-2px}
-.amts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.ab{background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:11px;padding:8px 16px;cursor:pointer;letter-spacing:1px;transition:all .15s}
+.fb:hover:not(.on){background:var(--bg2);color:#aaa}
+
+/* DONATE — compact top strip */
+.donate-strip{background:#0c0900;border-bottom:1px solid #2a1f00;padding:10px 20px}
+.donate-strip-inner{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.dt-label{font-family:var(--display);font-size:15px;color:var(--gold);letter-spacing:2px;white-space:nowrap}
+.dt-raised{font-family:var(--display);font-size:22px;color:var(--gold-dim);white-space:nowrap}
+.dt-raised-lbl{font-size:8px;color:var(--faint);display:block;letter-spacing:2px;margin-top:-3px}
+.amts{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.ab{background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:10px;padding:5px 10px;cursor:pointer;letter-spacing:1px;transition:all .15s}
 .ab.on{background:#1a1100;color:var(--gold);border-color:var(--gold-dim)}
-.ab:hover:not(.on){background:#181818;color:#aaa}
-.dfields{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
-.fw{display:flex;flex-direction:column;gap:4px}
-.flbl{font-size:8px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
-.di{background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:8px 12px;outline:none;width:100%}
-.di:focus{border-color:var(--gold-dim)}
-.di::placeholder{color:#3a3a3a}
-.paybtn{background:var(--gold-dim);border:1px solid var(--gold-dim);color:#000;font-family:var(--mono);font-size:11px;font-weight:700;padding:8px 20px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;transition:background .15s;height:38px}
+.ab:hover:not(.on){background:var(--bg2);color:#bbb}
+.dt-other{background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:10px;padding:5px 8px;outline:none;width:70px;display:none}
+.dt-other.show{display:inline-block}
+.dt-other:focus{border-color:var(--gold-dim)}
+.dt-fields{display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex:1;min-width:200px}
+.dt-input{background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:10px;padding:6px 10px;outline:none;flex:1;min-width:100px}
+.dt-input:focus{border-color:var(--gold-dim)}
+.dt-input::placeholder{color:var(--faint)}
+.paybtn{background:var(--gold-dim);border:none;color:#000;font-family:var(--mono);font-size:10px;font-weight:700;padding:7px 14px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;transition:background .15s}
 .paybtn:hover{background:var(--gold)}
 .paybtn:disabled{opacity:.4;cursor:not-allowed}
-.dnote{font-size:9px;color:#2a2a2a;margin-top:8px}
-.dsuccess{color:var(--green);font-size:11px;margin-top:8px;display:none}
-.dfeed{margin-top:14px;display:flex;flex-direction:column;gap:6px;max-height:120px;overflow-y:auto}
-.dfi{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;background:var(--bg2);font-size:10px;color:#666;gap:10px}
-.dfa{font-family:var(--display);font-size:18px;color:var(--gold-dim)}
-.status-bar{background:var(--bg1);border-top:1px solid var(--border);padding:7px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:10px;color:var(--dim);min-height:34px}
-.smsg{color:#555;flex:1}
-footer{background:var(--bg0);border-top:1px solid #111;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;font-size:9px;color:#2a2a2a;flex-wrap:wrap;gap:6px}
-footer a{color:#3a3a3a;text-decoration:none}
+.donate-feed{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;min-height:0}
+.dfi{display:flex;align-items:center;gap:6px;padding:2px 8px;background:var(--bg2);font-size:10px;color:var(--dim)}
+.dfa{font-family:var(--display);font-size:15px;color:var(--gold-dim)}
+.dsuccess{color:var(--green);font-size:11px;margin-top:5px;display:none}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-bottom:1px solid var(--border)}
+.sc{background:var(--bg1);padding:18px 20px}
+.sl{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.sn{font-family:var(--display);font-size:56px;line-height:1;color:var(--gold)}
+.ss{font-size:10px;margin-top:4px;color:var(--dim)}
+.ss.up{color:var(--green)}.ss.dn{color:var(--red)}.ss.fl{color:var(--dim)}
+
+/* SIGNAL */
+.signal-card{background:var(--bg1);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.sig-lbl{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
+.sig-wrap{flex:1;min-width:180px}
+.sig-ends{display:flex;justify-content:space-between;font-size:8px;color:var(--faint);letter-spacing:1px;margin-bottom:4px}
+.sig-bg{height:8px;background:var(--bg2);border-radius:4px;overflow:hidden}
+.sig-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#1e5c20,#c8860a,#7a1a1a);transition:width 1s ease}
+.sig-txt{font-size:11px;color:var(--muted);margin-top:5px}
+
+/* CHART */
+.chart-section{background:var(--bg1);padding:14px 20px;border-bottom:1px solid var(--border)}
+.section-label{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.cleg{display:flex;gap:16px;margin-bottom:8px}
+.cli{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--muted)}
+.cll{width:16px;height:2px;border-radius:1px}
+
+/* VEHICLES */
+.vehicles-section{background:var(--bg0);padding:14px 20px;border-bottom:1px solid var(--border)}
+.trow{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.tb{background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:9px;padding:5px 12px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .12s}
+.tb.on{background:var(--bg2);color:var(--text);border-color:var(--dim)}
+.tb:hover:not(.on){color:#aaa}
+#vehicleList{display:flex;flex-direction:column;gap:1px}
+.vr{background:var(--bg1);display:grid;grid-template-columns:90px 82px 1fr 90px 70px 86px;align-items:center;gap:8px;padding:9px 12px;font-size:10px;color:var(--muted);border-left:3px solid transparent;transition:all .12s}
+.vr:hover{border-left-color:var(--gold-dim);background:var(--bg2)}
+.vr.isR{border-left-color:#5a1818}
+.vvin{font-family:var(--mono);font-size:9px;color:var(--faint);letter-spacing:1px}
+.vtrim{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px}
+.vtrim.r{color:#ff7070;background:#1a0808;border:1px solid #3a1515}
+.vtrim.b{color:var(--gold);background:#1a1000;border:1px solid #3a2500}
+.vdeal{color:#999;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vmsrp{text-align:right;font-family:var(--display);font-size:19px;color:var(--gold)}
+.vmsrp.no-price{color:var(--faint);font-size:14px}
+.vdays{color:var(--faint);text-align:right;font-size:9px}
+.vlink a{display:inline-block;border:1px solid var(--border2);color:var(--dim);font-size:8px;padding:3px 7px;text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:all .12s;white-space:nowrap}
+.vlink a:hover{border-color:var(--gold-dim);color:var(--gold);background:#1a1100}
+.vh{background:transparent!important;border-left:3px solid transparent!important;color:var(--faint)!important;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:5px 12px!important}
+.vh:hover{background:transparent!important;border-left-color:transparent!important}
+.no-vehicles{color:var(--faint);font-size:11px;padding:16px 0;text-align:center;font-style:italic}
+
+/* DEALERS */
+.dealer-section{background:var(--bg0);padding:14px 20px;border-bottom:1px solid var(--border)}
+.dealer-table{width:100%;border-collapse:collapse;margin-top:4px}
+.dealer-table th{font-size:8px;color:var(--faint);letter-spacing:2px;text-transform:uppercase;padding:5px 8px;text-align:left;border-bottom:1px solid var(--border)}
+.dealer-table th:nth-child(n+4){text-align:right}
+.dt-row{border-bottom:1px solid #111;transition:background .1s}
+.dt-row:hover{background:#111}
+.dt-row td{padding:8px 8px;font-size:11px;vertical-align:middle}
+.dt-name a{color:var(--muted);text-decoration:none}
+.dt-name a:hover{color:var(--gold)}
+.dt-name.zero a{color:var(--faint)}
+.dt-city{color:var(--faint);font-size:10px}
+.dt-miles{color:var(--faint);font-size:9px;text-align:right}
+.dt-raptor{text-align:right;font-family:var(--display);font-size:20px;color:var(--gold-dim)}
+.dt-raptor.zero{color:var(--border2)}
+.dt-raptorR{text-align:right;font-family:var(--display);font-size:20px;color:var(--red)}
+.dt-raptorR.zero{color:var(--border2)}
+.dt-total{text-align:right;font-family:var(--display);font-size:24px;color:var(--gold)}
+.dt-total.zero{color:var(--border)}
+.dt-bar-bg{width:60px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;display:inline-block}
+.dt-bar-fill{height:100%;background:var(--gold-dim);border-radius:2px}
+
+/* BOTTOM INFO */
+.bottom-row{display:grid;grid-template-columns:1fr 1fr;background:var(--border);gap:1px;border-bottom:1px solid var(--border)}
+.pane{background:var(--bg0);padding:16px 20px}
+.cq{font-size:12px;color:#999;line-height:1.8;font-style:italic;border-left:2px solid var(--gold-dim);padding-left:12px;margin-top:8px}
+.stbl{margin-top:12px;width:100%;border-collapse:collapse}
+.stbl td{padding:4px 0;font-size:10px;color:var(--faint);border-bottom:1px solid #111}
+.stbl td:last-child{text-align:right;color:var(--dim)}
+
+/* STATUS + FOOTER */
+.status-bar{background:var(--bg1);border-top:1px solid var(--border);padding:6px 20px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--faint);min-height:32px;flex-wrap:wrap;gap:6px}
+.smsg{color:var(--dim);flex:1}
+footer{background:var(--bg0);border-top:1px solid #111;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;font-size:9px;color:var(--faint);flex-wrap:wrap;gap:6px}
+footer a{color:var(--dim);text-decoration:none}
 footer a:hover{color:var(--muted)}
-.lbanner{display:none;background:#0d0900;border-bottom:1px solid #2a1f00;padding:9px 24px;text-align:center;font-size:11px;color:var(--gold-dim);letter-spacing:2px;animation:blink 1.2s infinite}
+.lbanner{display:none;background:#0d0900;border-bottom:1px solid #2a1f00;padding:8px 20px;text-align:center;font-size:11px;color:var(--gold-dim);letter-spacing:2px;animation:blink 1.2s infinite}
 .lbanner.show{display:block}
-.scrape-banner{background:#050d00;border-bottom:1px solid #1a2a00;padding:9px 24px;text-align:center;font-size:11px;color:#6a8a30;letter-spacing:1px;display:none}
-.scrape-banner.show{display:block}
-.nodata{color:#333;font-size:11px;padding:10px 0;font-style:italic}
-.errnote{color:var(--red);font-size:10px;padding:10px 0}
-@media(max-width:700px){
+.nodata{color:var(--faint);font-size:11px;padding:8px 0;font-style:italic}
+
+/* MOBILE */
+@media(max-width:680px){
   .stats-row,.bottom-row{grid-template-columns:1fr}
   .sn{font-size:44px}
-  .dfields{grid-template-columns:1fr}
-  header,.price-strip,.chart-section,.vehicles-section,.dealer-section,.pane,.donate-section{padding:14px 16px}
-  .vr{grid-template-columns:80px 70px 1fr 80px}
+  header,.price-strip,.chart-section,.vehicles-section,.dealer-section,.pane,.donate-strip{padding:10px 14px}
+  .vr{grid-template-columns:75px 72px 1fr 80px}
   .vdays,.vlink,.vvin{display:none}
-  .dealer-table .dt-miles,.dealer-table .dt-bar-cell{display:none}
+  .dealer-table .dt-miles,.dt-bar-bg{display:none}
+  .donate-strip-inner{gap:10px}
+  .dt-fields{flex-direction:column;align-items:stretch}
+  .paybtn{width:100%}
+  /* Hide chart and dealer table on mobile to get to numbers fast */
+  .chart-section{display:none}
+  .dealer-section{display:none}
+  .bottom-row{display:none}
+  .friend-bar .friend-btn{display:none}
 }
- 
-/* CROSS PROMO */
-.crosspromo-bar{background:#080d08;border-bottom:1px solid #1a2a1a;padding:8px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.cp-label{font-size:8px;color:#2a4a2a;letter-spacing:3px;text-transform:uppercase;margin-right:8px}
-.cp-link{color:#4caf50;text-decoration:none;font-size:12px;font-weight:700;border-bottom:1px solid #2a4a2a}
-.cp-link:hover{color:#6fcf6f}
-.cp-desc{font-size:10px;color:#3a5a3a;margin-left:6px}
-.cp-btn{background:transparent;border:1px solid #2a4a2a;color:#4caf50;font-family:var(--mono);font-size:9px;padding:5px 12px;text-decoration:none;letter-spacing:1px;text-transform:uppercase;transition:all .15s}
-.cp-btn:hover{background:#0d1f0d;border-color:#4caf50}
- 
-/* DONATE TOP */
-.donate-top{background:#080600;border-bottom:2px solid #2a1f00;padding:14px 24px}
-.donate-top-inner{display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap}
-.dt-left{min-width:200px}
-.dt-title{font-family:var(--display);font-size:18px;color:var(--gold);letter-spacing:2px;line-height:1.2}
-.dt-sub{font-size:9px;color:var(--muted);margin-top:3px}
-.dt-total-wrap{text-align:right;min-width:60px}
-.dt-total{font-family:var(--display);font-size:28px;color:var(--gold-dim);line-height:1}
-.dt-total-lbl{font-size:8px;color:#3a3020;letter-spacing:2px;display:block}
-.dt-actions{flex:1;min-width:300px}
-.amts{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
-.ab{background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:10px;padding:5px 12px;cursor:pointer;letter-spacing:1px;transition:all .15s}
-.ab.on{background:#1a1100;color:var(--gold);border-color:var(--gold-dim)}
-.ab:hover:not(.on){background:#181818;color:#aaa}
-.dt-fields-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.dt-input{background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:10px;padding:7px 10px;outline:none;flex:1;min-width:120px}
-.dt-input:focus{border-color:var(--gold-dim)}
-.dt-input::placeholder{color:#3a3a3a}
-.di{background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:8px 12px;outline:none}
-.di:focus{border-color:var(--gold-dim)}
-.di::placeholder{color:#3a3a3a}
-.paybtn{background:var(--gold-dim);border:1px solid var(--gold-dim);color:#000;font-family:var(--mono);font-size:10px;font-weight:700;padding:7px 16px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;transition:background .15s}
-.paybtn:hover{background:var(--gold)}
-.paybtn:disabled{opacity:.4;cursor:not-allowed}
-.donate-feed-row{margin-top:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.dfeed{display:flex;gap:6px;flex-wrap:wrap;max-height:60px;overflow-y:auto}
-.dfi{display:flex;align-items:center;gap:6px;padding:3px 8px;background:var(--bg2);font-size:10px;color:#666}
-.dfa{font-family:var(--display);font-size:16px;color:var(--gold-dim)}
-.dsuccess{color:var(--green);font-size:11px;display:none}
 </style>
 </head>
 <body>
+
 <header>
-  <div class="logo">
+  <div>
     <div class="logo-title">PERMIAN RAPTOR INDEX</div>
-    <div class="logo-sub">Every Ford dealer · 150-mile radius · Midland TX · daily</div>
+    <div class="logo-sub">F-150 Raptor inventory · 150-mile radius · Midland TX · daily</div>
   </div>
   <div class="live-badge"><div class="dot"></div>LIVE · DAILY</div>
 </header>
- 
-<div class="sponsor-bar">
-  <span class="sp-lbl">Sponsored</span>
-  <span style="font-size:11px;color:#5a4a30">Your oilfield company here &nbsp;&nbsp;</span>
-  <a class="sp-link" href="mailto:sponsor@permianraptorindex.com">sponsor@permianraptorindex.com</a>
-  <span class="sp-lbl" style="margin-left:auto">$400/mo · 2-3K O&amp;G readers</span>
+
+
+
+<div class="friend-bar">
+  <span class="friend-text">Check out a friend's site: <a href="https://isoilabove100.com" target="_blank" rel="noopener">isoilabove100.com</a> — live WTI &amp; Brent crude prices</span>
+  <a class="friend-btn" href="https://isoilabove100.com" target="_blank" rel="noopener">IS OIL ABOVE $100? →</a>
 </div>
- 
-<!-- CROSS-PROMO: isoilabove100.com -->
-<div class="crosspromo-bar">
-  <div class="cp-left">
-    <span class="cp-label">SISTER SITE</span>
-    <a class="cp-link" href="https://isoilabove100.com" target="_blank" rel="noopener">
-      isoilabove100.com
-    </a>
-    <span class="cp-desc">— live WTI &amp; Brent prices, updated hourly</span>
-  </div>
-  <a class="cp-btn" href="https://isoilabove100.com" target="_blank" rel="noopener">
-    IS OIL ABOVE $100? →
-  </a>
-</div>
- 
- 
+
 <div class="lbanner" id="lb">LOADING INVENTORY DATA...</div>
-<div class="scrape-banner" id="scrapeBanner"></div>
- 
+
 <div class="price-strip">
-  <div class="pb"><span class="pl">WTI</span><span class="pv" id="wtiV">—</span><span class="pc" id="wtiC"></span></div>
+  <div class="pb"><span class="pl">WTI</span><span class="pv" id="wtiV">—</span></div>
   <span class="vsep">|</span>
   <div class="pb"><span class="pl">Brent</span><span class="pv" id="brtV">—</span></div>
   <span class="vsep">|</span>
-  <div class="pb"><span class="pl">As of</span><span style="font-size:11px;color:#555" id="asOf">—</span></div>
+  <div class="pb"><span class="pl">Updated</span><span style="font-size:11px;color:var(--muted)" id="asOf">—</span></div>
   <div class="frow">
     <button class="fb on" onclick="setF('all',this)">ALL</button>
     <button class="fb" onclick="setF('raptor',this)">RAPTOR</button>
     <button class="fb" onclick="setF('raptorR',this)">RAPTOR R</button>
   </div>
 </div>
-<!-- DONATION — compact, at top -->
-<div class="donate-top">
-  <div class="donate-top-inner">
-    <div class="dt-left">
-      <div class="dt-title">DONATE TO @REALPETE2020'S RAPTOR FUND</div>
-      <div class="dt-sub">Keep the index running · Apple Pay &amp; all cards · Stripe</div>
+
+<div class="donate-strip">
+  <div class="donate-strip-inner">
+    <div>
+      <div class="dt-label">DONATE TO @REALPETE2020'S RAPTOR FUND</div>
+      <div style="font-size:9px;color:var(--faint);margin-top:2px">Apple Pay &amp; all cards · powered by Stripe</div>
     </div>
-    <div class="dt-total-wrap">
-      <div class="dt-total" id="dtAmt">$0</div>
-      <span class="dt-total-lbl">RAISED</span>
+    <div style="text-align:right">
+      <div class="dt-raised" id="dtAmt">$0</div>
+      <span class="dt-raised-lbl">RAISED</span>
     </div>
-    <div class="dt-actions">
-      <div class="amts">
-        <button class="ab on" onclick="selAmt(500,this)">$5</button>
-        <button class="ab" onclick="selAmt(1000,this)">$10</button>
-        <button class="ab" onclick="selAmt(2500,this)">$25</button>
-        <button class="ab" onclick="selAmt(5000,this)">$50</button>
-        <button class="ab" onclick="selAmt(10000,this)">$100</button>
-      </div>
-      <div class="dt-fields-row">
-        <input class="di dt-input" id="dname" type="text" placeholder="Name (optional)" maxlength="60">
-        <input class="di dt-input" id="dmsg" type="text" placeholder="Message (optional)" maxlength="140">
-        <button class="paybtn" id="payBtn" onclick="doDonate()">PAY — APPLE PAY / CARD</button>
-      </div>
+    <div class="amts">
+      <button class="ab on" onclick="selAmt(500,this)">$5</button>
+      <button class="ab" onclick="selAmt(2500,this)">$25</button>
+      <button class="ab" onclick="selAmt(10000,this)">$100</button>
+      <button class="ab" id="otherBtn" onclick="selOther(this)">OTHER</button>
+      <input class="dt-other" id="otherAmt" type="number" min="1" max="500" placeholder="$" oninput="setOther(this)">
+    </div>
+    <div class="dt-fields">
+      <input class="dt-input" id="dname" type="text" placeholder="Name (optional)" maxlength="60" autocomplete="off">
+      <input class="dt-input" id="dmsg" type="text" placeholder="Message (optional)" maxlength="140" autocomplete="off">
+      <button class="paybtn" id="payBtn" onclick="doDonate()">PAY — APPLE PAY / CARD</button>
     </div>
   </div>
-  <div class="donate-feed-row">
-    <div class="dsuccess" id="dsucc">Donation received. Much obliged, pardner.</div>
-    <div class="dfeed" id="dfeed"></div>
-  </div>
+  <div class="dsuccess" id="dsucc">Donation received. Much obliged, pardner.</div>
+  <div class="donate-feed" id="dfeed"></div>
 </div>
- 
- 
+
 <div class="stats-row">
   <div class="sc"><div class="sl">Total In Stock</div><div class="sn" id="tot">—</div><div class="ss fl" id="totD">loading...</div></div>
-  <div class="sc"><div class="sl">Ford Raptor</div><div class="sn" id="rpt">—</div><div class="ss fl">F-150 · Ranger · verified trim</div></div>
-  <div class="sc"><div class="sl">Raptor R</div><div class="sn" id="rptR">—</div><div class="ss fl">5.2L supercharged · verified trim</div></div>
+  <div class="sc"><div class="sl">Ford Raptor</div><div class="sn" id="rpt">—</div><div class="ss fl">F-150 · verified trim</div></div>
+  <div class="sc"><div class="sl">Raptor R</div><div class="sn" id="rptR">—</div><div class="ss fl">5.2L supercharged</div></div>
 </div>
- 
+
 <div class="signal-card">
   <span class="sig-lbl">OFS Signal</span>
   <div class="sig-wrap">
@@ -294,22 +256,21 @@ footer a:hover{color:var(--muted)}
     <div class="sig-txt" id="sigT">Awaiting data...</div>
   </div>
 </div>
- 
+
 <div class="chart-section">
-  <div class="section-label">90-day trend — rising = bad (bust), falling = good (boom)</div>
+  <div class="section-label">90-day trend — rising = bad, falling = good</div>
   <div class="cleg">
     <div class="cli"><div class="cll" style="background:#f0a500"></div>Total</div>
-    <div class="cli"><div class="cll" style="background:#888"></div>Raptor</div>
+    <div class="cli"><div class="cll" style="background:#777"></div>Raptor</div>
     <div class="cli"><div class="cll" style="background:#e05555"></div>Raptor R</div>
   </div>
-  <div style="position:relative;width:100%;height:180px">
-    <canvas id="tC" role="img" aria-label="90-day Ford Raptor inventory trend">No data yet.</canvas>
+  <div style="position:relative;width:100%;height:160px">
+    <canvas id="tC" role="img" aria-label="90-day Raptor inventory trend chart">No data yet.</canvas>
   </div>
 </div>
- 
-<!-- VEHICLE LISTING -->
+
 <div class="vehicles-section">
-  <div class="section-label">Every Raptor on a lot within 150 miles of Midland TX — click to view at dealer</div>
+  <div class="section-label">Active vehicles on lots · VIN-verified · click to view at dealer</div>
   <div class="trow">
     <button class="tb on" onclick="setVTab('all',this)">ALL (<span id="tAll">—</span>)</button>
     <button class="tb" onclick="setVTab('raptorR',this)">RAPTOR R (<span id="tRR">—</span>)</button>
@@ -317,239 +278,110 @@ footer a:hover{color:var(--muted)}
   </div>
   <div id="vehicleList"><div class="nodata">Loading vehicles...</div></div>
 </div>
- 
-<!-- DEALER TABLE — shows every dealer including zeros -->
+
 <div class="dealer-section">
-  <div class="section-label">All Ford dealerships within 150 miles of Midland TX</div>
+  <div class="section-label">All Ford dealers within 150 miles of Midland TX</div>
   <div id="dealerTableWrap"><div class="nodata">Loading dealers...</div></div>
 </div>
- 
+
 <div class="bottom-row">
   <div class="pane">
     <div class="section-label">Field Notes</div>
-    <div class="cq" id="fNotes">"When WTI's above $80, every roughneck's got a Raptor on order and the lots are bare. When it drops to $55, the trucks start stacking up and Andrews Highway becomes a repo parade. The Permian giveth and the Permian taketh away."</div>
-    <div style="margin-top:14px;font-size:9px;color:#2a2a2a;line-height:2.1">
-      Checks every Ford dealer within 150 miles by name<br>
-      Raptor and Raptor R trims only · New inventory only<br>
-      Updated daily at 8AM CT · Powered by Anthropic web search
+    <div class="cq" id="fNotes">"When WTI's above $80, every roughneck's got a Raptor on order and the lots are bare. When it drops to $55, the trucks start stacking up. The Permian giveth and the Permian taketh away."</div>
+    <div style="margin-top:12px;font-size:9px;color:var(--faint);line-height:2">
+      F-150 Raptor and Raptor R only · new inventory only<br>
+      150-mile radius · Midland TX 79701 · updated 8AM CT daily
     </div>
   </div>
   <div class="pane">
-    <div class="section-label">Index Guide — inverted signal</div>
+    <div class="section-label">Index Guide</div>
     <table class="stbl">
       <tr><td>0–8 trucks</td><td style="color:var(--green)">BOOM · Basin hot, lots bare</td></tr>
       <tr><td>8–20 trucks</td><td style="color:#6aaf50">STRONG · money moving</td></tr>
       <tr><td>20–40 trucks</td><td style="color:var(--muted)">NEUTRAL · watch the trend</td></tr>
       <tr><td>40–60 trucks</td><td style="color:#c8860a">COOLING · spending slows</td></tr>
       <tr><td>60–80 trucks</td><td style="color:var(--red)">SLOW · crews getting cut</td></tr>
-      <tr><td>80+ trucks</td><td style="color:#ff4444">BUST · repo man's busy</td></tr>
+      <tr><td>80+ trucks</td><td style="color:#ff5555">BUST · repo man's busy</td></tr>
     </table>
-    <div style="margin-top:10px;font-size:9px;color:#2a2a2a;line-height:1.9">
+    <div style="margin-top:10px;font-size:9px;color:var(--faint);line-height:1.8">
       High inventory = trucks sitting = workers not buying = Basin slowing<br>
       Low inventory = trucks sold = workers flush = Permian running hot
     </div>
   </div>
 </div>
- 
- 
- 
+
 <div class="status-bar">
   <span class="smsg" id="smsg">Loading inventory data...</span>
-  <span id="dtrk" style="color:#2a2a2a;white-space:nowrap"></span>
+  <span id="dtrk" style="color:var(--faint);white-space:nowrap"></span>
 </div>
- 
+
 <footer>
   <span>PERMIAN RAPTOR INDEX &copy; <span id="yr"></span></span>
-  <span>Checks every Ford dealer within 150mi of Midland TX · Daily 8AM CT</span>
+  <span>F-150 Raptor only · 150mi/Midland TX · 8AM CT daily</span>
   <span>Not affiliated with Ford Motor Company</span>
 </footer>
- 
+
 <script>
+'use strict';
+// Security: no API keys in this file. All data comes from /api/data (read-only Supabase).
+// Secrets are never exposed to the browser.
+
 let snaps=[],vehs=[],dlrs=[],dons=[],knownDealers=[];
 let fMode='all',vTab='all',dAmt=500,tc=null;
+
 document.getElementById('yr').textContent=new Date().getFullYear();
+
+// Post-donation redirect
 if(new URLSearchParams(location.search).get('donated')==='1'){
   document.getElementById('dsucc').style.display='block';
   history.replaceState({},'','/');
 }
+
 function setF(f,b){fMode=f;document.querySelectorAll('.fb').forEach(x=>x.classList.remove('on'));b.classList.add('on');renderStats()}
 function setVTab(t,b){vTab=t;document.querySelectorAll('.tb').forEach(x=>x.classList.remove('on'));b.classList.add('on');renderVehs()}
- 
+
+// ── LOAD DATA ─────────────────────────────────────────────
+// ONLY reads from /api/data — no client-side scraping, no API keys in browser
 async function loadData(){
   document.getElementById('lb').classList.add('show');
-  document.getElementById('smsg').textContent='Loading saved inventory data...';
+  document.getElementById('smsg').textContent='Loading inventory data...';
   try{
     const r=await fetch('/api/data');
     if(!r.ok) throw new Error('HTTP '+r.status);
     const d=await r.json();
-    snaps=d.snapshots||[];vehs=d.vehicles||[];dlrs=d.dealers||[];dons=d.donations||[];knownDealers=d.knownDealers||[];
- 
-    const today=new Date().toISOString().split('T')[0];
-    const hasToday=snaps.some(s=>s.snap_date===today);
- 
-    if(snaps.length){
-      renderStats();renderVehs();renderDealerTable();renderChart();renderDons(d.totalDonatedCents||0);
-      const l=snaps[snaps.length-1];
-      const ds=new Date(l.snap_date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-      document.getElementById('asOf').textContent=ds;
-      if(l.wti_price){const p=parseFloat(l.wti_price);document.getElementById('wtiV').textContent='$'+p.toFixed(2);document.getElementById('brtV').textContent='$'+(p+2.5).toFixed(2)}
-      if(l.commentary) document.getElementById('fNotes').textContent='"'+l.commentary+'"';
-      document.getElementById('smsg').textContent='Data as of '+ds+' · '+snaps.length+' days tracked · checks all '+knownDealers.length+' dealers in range · 8AM CT daily';
-      document.getElementById('dtrk').textContent=snaps.length+' days of history';
-    } else {
-      renderDealerTable(); // show dealer list even before first scrape
+    snaps=d.snapshots||[];
+    vehs=d.vehicles||[];
+    dlrs=d.dealers||[];
+    dons=d.donations||[];
+    knownDealers=d.knownDealers||[];
+
+    if(!snaps.length){
+      document.getElementById('smsg').textContent='No data yet — first scrape runs at 8AM CT. Check back tomorrow.';
+      document.getElementById('vehicleList').innerHTML='<div class="nodata">First data appears after the 8AM CT daily scrape.</div>';
+      document.getElementById('dealerTableWrap').innerHTML='<div class="nodata">Awaiting first scrape...</div>';
+      return;
     }
- 
-    document.getElementById('lb').classList.remove('show');
-    if(!hasToday) runDailyScrape();
+
+    renderStats();renderVehs();renderDealerTable();renderChart();renderDons(d.totalDonatedCents||0);
+
+    const l=snaps[snaps.length-1];
+    const ds=new Date(l.snap_date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    document.getElementById('asOf').textContent=ds;
+    if(l.wti_price){
+      const p=parseFloat(l.wti_price);
+      document.getElementById('wtiV').textContent='$'+p.toFixed(2);
+      document.getElementById('brtV').textContent='$'+(p+2.5).toFixed(2);
+    }
+    if(l.commentary) document.getElementById('fNotes').textContent='"'+l.commentary+'"';
+    document.getElementById('smsg').textContent='Updated '+ds+' · '+snaps.length+' days tracked · auto-updates 8AM CT';
+    document.getElementById('dtrk').textContent=snaps.length+' days of history';
   }catch(e){
-    document.getElementById('lb').classList.remove('show');
-    document.getElementById('smsg').textContent='Error: '+e.message;
-    renderDealerTable();
-    runDailyScrape();
-  }
-}
- 
-async function runDailyScrape(){
-  const banner=document.getElementById('scrapeBanner');
-  const steps=['Checking Sewell Ford (Odessa)...','Checking Rogers Ford (Midland)...','Checking AutoInc (Odessa & Midland)...','Checking Big Spring, Andrews, Lamesa...','Checking Sweetwater, Abilene, San Angelo...','Compiling inventory count...'];
-  let si=0;
-  banner.textContent=steps[0];
-  banner.classList.add('show');
-  const stepTimer=setInterval(()=>{if(si<steps.length-1) banner.textContent=steps[++si]},8000);
- 
-  try{
-    const dealerList=(knownDealers.length?knownDealers:[
-      {name:'Sewell Ford',city:'Odessa',state:'TX',miles:20,url:'https://www.sewellford.com'},
-      {name:'Rogers Ford',city:'Midland',state:'TX',miles:0,url:'https://www.rogersford.com'},
-      {name:'Bailey Toliver Ford',city:'Stanton',state:'TX',miles:35,url:'https://www.baileytoliverford.com'},
-      {name:'Star Ford',city:'Big Spring',state:'TX',miles:40,url:'https://www.starfordbigspring.com'},
-      {name:'AutoInc Ford',city:'Odessa',state:'TX',miles:20,url:'https://www.autoinc.com'},
-      {name:'Permian Ford',city:'Andrews',state:'TX',miles:36,url:'https://www.permianford.net'},
-      {name:'Premier Ford of Lamesa',city:'Lamesa',state:'TX',miles:51,url:'https://www.premierfordoflamesa.com'},
-      {name:'Smith Auto Family Ford',city:'Levelland',state:'TX',miles:75,url:'https://www.smithautofamily.com'},
-      {name:'Stanley Ford Sweetwater',city:'Sweetwater',state:'TX',miles:90,url:'https://www.stanleyfordsweetwater.com'},
-      {name:'Arrow Ford',city:'Abilene',state:'TX',miles:101,url:'https://www.arrowford.net'},
-      {name:'AutoInc Ford San Angelo',city:'San Angelo',state:'TX',miles:101,url:'https://www.autoinc.com'},
-      {name:'AutoInc Ford Lubbock',city:'Lubbock',state:'TX',miles:115,url:'https://www.autoinc.com'},
-    ]);
- 
-    const dealerLines=dealerList.map(d=>`- ${d.name} in ${d.city}, ${d.state} (${d.miles} miles) — ${d.url}`).join('\n');
- 
-    const prompt=`Search the new vehicle inventory at each of these specific Ford dealerships for Ford F-150 Raptor and Ford Raptor R trucks currently in stock. All within 150 miles of Midland TX.
- 
-DEALERSHIPS TO CHECK:
-${dealerLines}
- 
-For each dealership, check their website inventory. Look specifically for:
-- New Ford F-150 Raptor (any year)
-- New Ford F-150 Raptor R (any year)
-- New Ford Ranger Raptor
- 
-Do NOT count used vehicles. New inventory only.
-Trim must specifically say "Raptor" or "Raptor R" — not just any F-150.
- 
-For each Raptor found provide: VIN (17 chars if visible), trim, year, price (exact number or null if not shown), dealer name, dealer city, and a direct URL to that specific vehicle listing.
- 
-Also get the current WTI crude oil price.
- 
-Respond ONLY with valid JSON:
-{
-  "wtiPrice": <number or null>,
-  "vehicles": [
-    {"vin":"<17-char or empty>","trim":"<Raptor or Raptor R>","model_year":<year>,"model":"<F-150 or Ranger>","dealer_name":"<name>","dealer_city":"<city>","dealer_state":"<TX or NM>","msrp":<number or null>,"vehicle_url":"<url or null>","dealer_url":"<dealer homepage>"}
-  ],
-  "commentary": "<sardonic one-liner: low inventory = boom, high inventory = bust>"
-}`;
- 
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key':window.__ANTHROPIC_KEY__||'',
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-direct-browser-access':'true',
-      },
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:8000,
-        tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:prompt}],
-      }),
-    });
- 
-    if(!resp.ok) throw new Error('Anthropic: '+resp.status);
-    const data=await resp.json();
-    let raw='';
-    for(const b of (data.content||[])){if(b.type==='text') raw+=b.text}
-    raw=raw.replace(/```json|```/g,'').trim();
-    const s=raw.indexOf('{'),e2=raw.lastIndexOf('}');
-    if(s<0||e2<0) throw new Error('No JSON in response');
-    const result=JSON.parse(raw.slice(s,e2+1));
- 
-    const wti=parseFloat(result.wtiPrice)||null;
-    if(wti){
-      document.getElementById('wtiV').textContent='$'+wti.toFixed(2);
-      document.getElementById('brtV').textContent='$'+(wti+2.5).toFixed(2);
-    }
- 
-    const today=new Date().toISOString().split('T')[0];
-    document.getElementById('asOf').textContent=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    if(result.commentary) document.getElementById('fNotes').textContent='"'+result.commentary+'"';
- 
-    vehs=(result.vehicles||[]).map(v=>({
-      vin:v.vin&&v.vin.length===17?v.vin:null,
-      model_year:v.model_year||new Date().getFullYear(),
-      model:v.model||'F-150',trim:v.trim||'Raptor',
-      msrp:v.msrp||null,color:null,
-      dealer_name:v.dealer_name||'Unknown',
-      dealer_city:v.dealer_city||'',
-      dealer_state:v.dealer_state||'TX',
-      vehicle_url:v.vehicle_url||null,
-      dealer_url:v.dealer_url||null,
-      first_seen:today,last_seen:today,
-    }));
- 
-    // Rebuild dealer list with counts
-    const dm=new Map();
-    for(const d of dealerList) dm.set(d.name,{...d,raptor:0,raptorR:0});
-    for(const v of vehs){
-      const key=[...dm.keys()].find(k=>k.toLowerCase().includes(v.dealer_name.toLowerCase().split(' ')[0])||v.dealer_name.toLowerCase().includes(k.toLowerCase().split(' ')[0]))||v.dealer_name;
-      if(!dm.has(key)) dm.set(key,{name:v.dealer_name,city:v.dealer_city,state:v.dealer_state,url:v.dealer_url,miles:null,raptor:0,raptorR:0});
-      const d=dm.get(key);
-      if(v.trim==='Raptor R') d.raptorR++; else d.raptor++;
-    }
-    dlrs=Array.from(dm.values()).sort((a,b)=>(b.raptor+b.raptorR)-(a.raptor+a.raptorR));
- 
-    const total=vehs.length;
-    const rap=vehs.filter(v=>v.trim!=='Raptor R').length;
-    const rapR=vehs.filter(v=>v.trim==='Raptor R').length;
- 
-    const snap={snap_date:today,total,raptor:rap,raptor_r:rapR,wti_price:wti,commentary:result.commentary};
-    const ei=snaps.findIndex(s=>s.snap_date===today);
-    if(ei>=0) snaps[ei]=snap; else snaps.push(snap);
- 
-    renderStats();renderVehs();renderDealerTable();renderChart();
-    document.getElementById('smsg').textContent='Live search complete · '+total+' Raptors across '+dealerList.length+' dealers checked · updated just now';
- 
-    // Save to Supabase
-    if(window.__CRON_SECRET__){
-      fetch('/api/save-snapshot',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+window.__CRON_SECRET__},
-        body:JSON.stringify({total,raptor:rap,raptorR:rapR,wtiPrice:wti,commentary:result.commentary,vehicles:vehs}),
-      }).catch(e=>console.error('Save failed:',e));
-    }
- 
-  }catch(err){
-    console.error('Scrape error:',err);
-    document.getElementById('smsg').textContent='Search error: '+err.message;
+    document.getElementById('smsg').textContent='Error loading data: '+e.message;
   }finally{
-    clearInterval(stepTimer);
-    banner.classList.remove('show');
+    document.getElementById('lb').classList.remove('show');
   }
 }
- 
+
 function renderStats(){
   if(!snaps.length) return;
   const l=snaps[snaps.length-1],p=snaps.length>1?snaps[snaps.length-2]:null;
@@ -562,12 +394,15 @@ function renderStats(){
   document.getElementById('rptR').textContent=rRd;
   if(p){
     const d=l.total-p.total,el=document.getElementById('totD');
-    el.textContent=d>0?'▲ +'+d+' — inventory up (slowing)':d<0?'▼ '+Math.abs(d)+' — inventory down (good sign)':'▶ no change';
+    el.textContent=d>0?'▲ +'+d+' vs yesterday':d<0?'▼ '+Math.abs(d)+' vs yesterday':'▶ no change';
     el.className='ss '+(d>0?'dn':d<0?'up':'fl');
-  } else {document.getElementById('totD').textContent='first data point';document.getElementById('totD').className='ss fl'}
+  } else {
+    document.getElementById('totD').textContent='first data point';
+    document.getElementById('totD').className='ss fl';
+  }
   updateSig(l.total);
 }
- 
+
 function updateSig(n){
   const pct=Math.min(100,Math.max(4,Math.round((n/100)*100)));
   document.getElementById('sigF').style.width=pct+'%';
@@ -580,7 +415,22 @@ function updateSig(n){
   else t=n+' trucks · BUST — repo man on Andrews Hwy is having a great month';
   document.getElementById('sigT').textContent=t;
 }
- 
+
+// Safe text helper — prevents XSS in innerHTML
+function esc(str){
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Safe URL helper — only allow https:// links
+function safeUrl(url){
+  if(!url) return null;
+  try{
+    const u=new URL(url);
+    if(u.protocol==='https:') return url;
+  }catch{}
+  return null;
+}
+
 function renderVehs(){
   const rR=vehs.filter(v=>v.trim==='Raptor R'),base=vehs.filter(v=>v.trim!=='Raptor R');
   document.getElementById('tAll').textContent=vehs.length;
@@ -588,7 +438,7 @@ function renderVehs(){
   document.getElementById('tR').textContent=base.length;
   const list=vTab==='raptorR'?rR:vTab==='raptor'?base:vehs;
   if(!list.length){
-    document.getElementById('vehicleList').innerHTML='<div class="no-vehicles">No '+vTab+' trucks in stock at any dealer within 150 miles right now.<br><span style="color:#2a2a2a;font-size:10px">This is good news — Basin is buying.</span></div>';
+    document.getElementById('vehicleList').innerHTML='<div class="no-vehicles">No '+esc(vTab)+' trucks in stock within 150 miles right now.</div>';
     return;
   }
   const today=new Date();
@@ -598,90 +448,116 @@ function renderVehs(){
     const isR=v.trim==='Raptor R';
     const d=days(v.first_seen);
     const priceHtml=v.msrp
-      ?'<span class="vmsrp has-price">$'+(v.msrp/1000).toFixed(0)+'k</span>'
+      ?'<span class="vmsrp">$'+Math.round(v.msrp/1000)+'k</span>'
       :'<span class="vmsrp no-price">—</span>';
-    const vinDisplay=v.vin?v.vin.slice(0,4)+'…'+v.vin.slice(-4):'—';
-    const lk=v.vehicle_url
-      ?'<a href="'+v.vehicle_url+'" target="_blank" rel="noopener">VIEW →</a>'
-      :'<span style="color:#1a1a1a">—</span>';
+    const vinDisplay=v.vin?esc(v.vin.slice(0,4))+'…'+esc(v.vin.slice(-4)):'—';
+    const url=safeUrl(v.vehicle_url);
+    const lk=url
+      ?'<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">VIEW →</a>'
+      :'<span style="color:#222">—</span>';
     return '<div class="vr'+(isR?' isR':'')+'"><span class="vvin">'+vinDisplay+'</span>'
-      +'<span class="vtrim '+(isR?'r':'b')+'">'+v.trim.toUpperCase()+'</span>'
-      +'<span class="vdeal">'+v.dealer_name+(v.dealer_city?'<br><span style="font-size:9px;color:#444">'+v.dealer_city+'</span>':'')+'</span>'
+      +'<span class="vtrim '+(isR?'r':'b')+'">'+esc(v.trim).toUpperCase()+'</span>'
+      +'<span class="vdeal">'+esc(v.dealer_name)+(v.dealer_city?'<br><span style="font-size:9px;color:var(--faint)">'+esc(v.dealer_city)+'</span>':'')+'</span>'
       +priceHtml
-      +'<span class="vdays">'+(d===0?'Today':d+'d ago')+'</span>'
+      +'<span class="vdays">'+(d===0?'Today':d+'d')+'</span>'
       +'<span class="vlink">'+lk+'</span></div>';
   }).join('');
   document.getElementById('vehicleList').innerHTML=hdr+rows;
 }
- 
+
 function renderDealerTable(){
   const list=dlrs.length?dlrs:(knownDealers.length?knownDealers.map(d=>({...d,raptor:0,raptorR:0})):[]);
-  if(!list.length){document.getElementById('dealerTableWrap').innerHTML='<div class="nodata">Dealer list loading...</div>';return}
+  if(!list.length){document.getElementById('dealerTableWrap').innerHTML='<div class="nodata">Loading dealer list...</div>';return}
   const max=Math.max(...list.map(d=>(d.raptor||0)+(d.raptorR||0)),1);
   const rows=list.map(d=>{
-    const ct=(d.raptor||0)+(d.raptorR||0);
-    const isZero=ct===0;
-    const pct=Math.round((ct/max)*100);
-    const nameHtml=d.url
-      ?'<a href="'+d.url+'" target="_blank" rel="noopener">'+d.name+'</a>'
-      :d.name;
+    const ct=(d.raptor||0)+(d.raptorR||0),isZero=ct===0,pct=Math.round((ct/max)*100);
+    const url=safeUrl(d.url);
+    const nm=url?'<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">'+esc(d.name)+'</a>':esc(d.name);
     return '<tr class="dt-row">'
-      +'<td class="dt-name'+(isZero?' zero':'')+'">'+nameHtml+'</td>'
-      +'<td class="dt-city">'+d.city+', '+(d.state||'TX')+'</td>'
+      +'<td class="dt-name'+(isZero?' zero':'')+'">'+nm+'</td>'
+      +'<td class="dt-city">'+esc(d.city)+', '+esc(d.state||'TX')+'</td>'
       +'<td class="dt-miles">'+(d.miles!=null?d.miles+'mi':'—')+'</td>'
-      +'<td class="dt-raptor'+(isZero?' zero':'')+'">'+((d.raptor||0)||'—')+'</td>'
-      +'<td class="dt-raptorR'+(isZero?' zero':'')+'">'+((d.raptorR||0)||'—')+'</td>'
-      +'<td class="dt-total'+(isZero?' zero':'')+'">'+((ct||0)||'—')+'</td>'
-      +'<td class="dt-bar-cell"><div class="dt-bar-bg"><div class="dt-bar-fill" style="width:'+pct+'%"></div></div></td>'
+      +'<td class="dt-raptor'+(isZero?' zero':'')+'">'+(d.raptor||0||'—')+'</td>'
+      +'<td class="dt-raptorR'+(isZero?' zero':'')+'">'+(d.raptorR||0||'—')+'</td>'
+      +'<td class="dt-total'+(isZero?' zero':'')+'">'+(ct||'—')+'</td>'
+      +'<td><div class="dt-bar-bg"><div class="dt-bar-fill" style="width:'+pct+'%"></div></div></td>'
       +'</tr>';
   }).join('');
- 
   document.getElementById('dealerTableWrap').innerHTML=
-    '<table class="dealer-table">'
-    +'<thead><tr><th>Dealer</th><th>City</th><th>Dist</th><th>Raptor</th><th>Raptor R</th><th>Total</th><th></th></tr></thead>'
-    +'<tbody>'+rows+'</tbody>'
-    +'</table>';
+    '<table class="dealer-table"><thead><tr><th>Dealer</th><th>City</th><th>Dist</th><th>Raptor</th><th>R</th><th>Total</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
 }
- 
+
 function renderChart(){
   const labels=snaps.map(s=>{const d=new Date(s.snap_date+'T12:00:00');return(d.getMonth()+1)+'/'+d.getDate()});
   if(tc) tc.destroy();
   tc=new Chart(document.getElementById('tC'),{type:'line',
     data:{labels,datasets:[
-      {label:'Total',data:snaps.map(s=>s.total),borderColor:'#f0a500',borderWidth:2,pointRadius:snaps.length<15?3:1,pointBackgroundColor:'#f0a500',fill:true,backgroundColor:'rgba(200,134,10,.07)',tension:.35},
+      {label:'Total',data:snaps.map(s=>s.total),borderColor:'#f0a500',borderWidth:2,pointRadius:snaps.length<15?3:1,pointBackgroundColor:'#f0a500',fill:true,backgroundColor:'rgba(200,134,10,.06)',tension:.35},
       {label:'Raptor',data:snaps.map(s=>s.raptor),borderColor:'#666',borderWidth:1,borderDash:[5,4],pointRadius:0,fill:false,tension:.35},
       {label:'Raptor R',data:snaps.map(s=>s.raptor_r),borderColor:'#e05555',borderWidth:1,borderDash:[2,5],pointRadius:0,fill:false,tension:.35}
     ]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{backgroundColor:'#111',titleColor:'#f0a500',bodyColor:'#888',borderColor:'#2a2a2a',borderWidth:1}},
-      scales:{x:{grid:{color:'#111'},ticks:{color:'#444',font:{size:9},maxTicksLimit:12,autoSkip:true}},y:{grid:{color:'#111'},ticks:{color:'#444',font:{size:9},stepSize:10},beginAtZero:true}}
+      scales:{x:{grid:{color:'#181818'},ticks:{color:'#555',font:{size:9},maxTicksLimit:12,autoSkip:true}},y:{grid:{color:'#181818'},ticks:{color:'#555',font:{size:9},stepSize:10},beginAtZero:true}}
     }
   });
 }
- 
-function renderDons(tc2){
-  document.getElementById('dtAmt').textContent='$'+(tc2/100).toFixed(0);
+
+function renderDons(totalCents){
+  document.getElementById('dtAmt').textContent='$'+Math.round(totalCents/100);
   if(!dons.length) return;
-  document.getElementById('dfeed').innerHTML=dons.map(d=>{
+  document.getElementById('dfeed').innerHTML=dons.slice(0,6).map(d=>{
     const dt=new Date(d.donated_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    return '<div class="dfi"><span class="dfa">$'+(d.amount_cents/100).toFixed(0)+'</span><span style="color:#888">'+(d.display_name||'Anonymous')+'</span>'+(d.message?'<span style="color:#444;font-style:italic;font-size:9px">"'+d.message+'"</span>':'')+'<span style="color:#2a2a2a">'+dt+'</span></div>';
+    return '<div class="dfi"><span class="dfa">$'+Math.round(d.amount_cents/100)+'</span>'
+      +'<span style="color:var(--muted)">'+esc(d.display_name||'Anonymous')+'</span>'
+      +(d.message?'<span style="color:var(--faint);font-style:italic;font-size:9px">"'+esc(d.message)+'"</span>':'')
+      +'<span style="color:var(--faint)">'+dt+'</span></div>';
   }).join('');
 }
- 
-function selAmt(c,b){dAmt=c;document.querySelectorAll('.ab').forEach(x=>x.classList.remove('on'));b.classList.add('on')}
- 
+
+function selAmt(c,b){
+  dAmt=c;
+  document.querySelectorAll('.ab').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  document.getElementById('otherAmt').classList.remove('show');
+}
+
+function selOther(b){
+  document.querySelectorAll('.ab').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  const inp=document.getElementById('otherAmt');
+  inp.classList.add('show');
+  inp.focus();
+  dAmt=0;
+}
+
+function setOther(inp){
+  const v=parseInt(inp.value);
+  dAmt=(v>0&&v<=500)?v*100:0;
+}
+
 async function doDonate(){
+  if(!dAmt||dAmt<100){alert('Please select or enter a valid amount.');return}
   const btn=document.getElementById('payBtn');
   btn.disabled=true;btn.textContent='OPENING CHECKOUT...';
+  const name=(document.getElementById('dname').value||'').trim().slice(0,60)||'Anonymous';
+  const msg=(document.getElementById('dmsg').value||'').trim().slice(0,140);
   try{
-    const r=await fetch('/api/donate',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({amount_cents:dAmt,display_name:document.getElementById('dname').value.trim()||'Anonymous',message:document.getElementById('dmsg').value.trim()})});
+    const r=await fetch('/api/donate',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({amount_cents:dAmt,display_name:name,message:msg})
+    });
     const d=await r.json();
-    if(d.url) window.location.href=d.url;
+    if(d.url){window.location.href=d.url}
     else throw new Error(d.error||'Unknown error');
-  }catch(e){alert('Payment error: '+e.message);btn.disabled=false;btn.textContent='PAY — APPLE PAY / CARD'}
+  }catch(e){
+    alert('Payment error: '+e.message);
+    btn.disabled=false;
+    btn.textContent='PAY — APPLE PAY / CARD';
+  }
 }
- 
+
 loadData();
 </script>
 </body>
