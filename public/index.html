@@ -320,7 +320,7 @@ footer a:hover{color:var(--muted)}
         <button class="ab" onclick="selAmt(2500,this)">$25</button>
         <button class="ab" onclick="selAmt(10000,this)">$100</button>
         <button class="ab" id="otherBtn" onclick="selOther(this)">OTHER</button>
-        <input class="dt-other" id="otherAmt" type="number" min="1" max="500" placeholder="$" oninput="setOther(this)">
+        <input class="dt-other" id="otherAmt" type="number" min="1" max="10000" placeholder="$" oninput="setOther(this)">
         <div class="don-raised-inline">
           <span class="dt-raised" id="dtAmt">$0</span>
           <span class="dt-raised-lbl">RAISED</span>
@@ -897,7 +897,7 @@ function closeVehModal(){
 
 function selAmt(c,b){dAmt=c;document.querySelectorAll('.ab').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.getElementById('otherAmt').classList.remove('show');}
 function selOther(b){document.querySelectorAll('.ab').forEach(x=>x.classList.remove('on'));b.classList.add('on');const i=document.getElementById('otherAmt');i.classList.add('show');i.focus();dAmt=0;}
-function setOther(i){const v=parseInt(i.value);dAmt=(v>0&&v<=500)?v*100:0;}
+function setOther(i){const v=parseInt(i.value);dAmt=(v>0&&v<=10000)?v*100:0;}
 
 async function doDonate(){
   if(!dAmt||dAmt<100){alert('Please select or enter a valid amount.');return;}
