@@ -25,38 +25,55 @@ export default async function handler(req, res) {
   const { error: snapErr } = await supabase
     .from('snapshots')
     .upsert({
-      snap_date:  today,
-      total:      inv.total,
-      raptor:     inv.raptor,
-      raptor_r:   inv.raptorR,
-      wti_price:  wtiPrice,
+      snap_date:    today,
+      total:        inv.total,
+      raptor:       inv.raptor,
+      raptor_r:     inv.raptorR,
+      wti_price:    wtiPrice,
       commentary,
-      scraped_at: new Date().toISOString(),
+      scraped_at:   new Date().toISOString(),
+      avg_days_lot: inv.vehicles.length
+        ? Math.round(inv.vehicles.reduce((s, v) => s + (v.days_on_lot || 0), 0) / inv.vehicles.length)
+        : null,
     }, { onConflict: 'snap_date' });
   if (snapErr) console.error('[cron] snapshot error:', snapErr.message);
 
-  // Wipe today's vehicles and reinsert clean
-  await supabase.from('vehicles').delete().eq('last_seen', today);
+  // Mark all currently active as inactive first
   await supabase.from('vehicles').update({ active: false }).eq('active', true);
 
   if (inv.vehicles.length > 0) {
+    const currentVins = inv.vehicles.map(v => v.vin).filter(Boolean);
+
+    // Get first_seen dates for VINs we've seen before (preserve history)
+    const { data: existing } = await supabase
+      .from('vehicles')
+      .select('vin, first_seen')
+      .in('vin', currentVins);
+
+    const firstSeenMap = {};
+    for (const e of (existing || [])) firstSeenMap[e.vin] = e.first_seen;
+
     const rows = inv.vehicles.map(v => ({
-      vin:          v.vin,
-      model_year:   v.model_year,
-      model:        'F-150',
-      trim:         v.trim,
-      color:        v.color || null,
-      msrp:         v.msrp || null,
-      dealer_name:  v.dealer_name,
-      dealer_city:  v.dealer_city,
-      dealer_state: v.dealer_state || 'TX',
-      dealer_url:   v.dealer_url   || null,
-      vehicle_url:  v.vehicle_url  || null,
-      dealer_lat:   v.dealer_lat   || null,
-      dealer_lng:   v.dealer_lng   || null,
-      first_seen:   today,
-      last_seen:    today,
-      active:       true,
+      vin:             v.vin,
+      model_year:      v.model_year,
+      model:           'F-150',
+      trim:            v.trim,
+      color:           v.color            || null,
+      msrp:            v.msrp             || null,
+      dealer_name:     v.dealer_name,
+      dealer_city:     v.dealer_city,
+      dealer_state:    v.dealer_state     || 'TX',
+      dealer_url:      v.dealer_url       || null,
+      vehicle_url:     v.vehicle_url      || null,
+      dealer_lat:      v.dealer_lat       || null,
+      dealer_lng:      v.dealer_lng       || null,
+      days_on_lot:     v.days_on_lot      || 0,
+      days_on_lot_180: v.days_on_lot_180  || v.days_on_lot || 0,
+      first_listed:    v.first_listed     || null,
+      // Preserve original first_seen if we've seen this VIN before
+      first_seen:      firstSeenMap[v.vin] || today,
+      last_seen:       today,
+      active:          true,
     }));
 
     const { error: vErr } = await supabase
@@ -75,5 +92,8 @@ export default async function handler(req, res) {
     raptorR:  inv.raptorR,
     wti:      wtiPrice,
     vehicles: inv.vehicles.length,
+    avgDays:  inv.vehicles.length
+      ? Math.round(inv.vehicles.reduce((s, v) => s + (v.days_on_lot || 0), 0) / inv.vehicles.length)
+      : 0,
   });
 }
