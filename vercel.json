@@ -8,6 +8,12 @@
   "rewrites": [
     { "source": "/", "destination": "/api/index" }
   ],
+  "headers": [
+    {
+      "source": "/logo.png",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }]
+    }
+  ],
   "functions": {
     "api/cron.js": {
       "maxDuration": 300
