@@ -10,6 +10,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -121,6 +126,14 @@ footer a:hover{color:var(--muted)}
 .lbanner{display:none;background:#0d0900;border-bottom:1px solid #2a1f00;padding:8px 20px;text-align:center;font-size:11px;color:var(--gold-dim);letter-spacing:2px;animation:blink 1.2s infinite}
 .lbanner.show{display:block}
 .nodata{color:var(--faint);font-size:11px;padding:8px 0;font-style:italic}
+.map-section{background:var(--bg0);padding:14px 20px;border-bottom:1px solid var(--border)}
+#raptorMap{width:100%;height:380px;border:1px solid var(--border2);border-radius:2px;background:#111}
+.leaflet-container{background:#1a1a1a!important;font-family:var(--mono)!important}
+.raptor-popup{font-family:var(--mono);font-size:11px;color:#111;min-width:160px}
+.raptor-popup strong{font-family:var(--display);font-size:16px;color:#c8860a;display:block;margin-bottom:4px}
+.raptor-popup a{color:#c8860a;text-decoration:none;font-size:10px}
+.raptor-popup a:hover{text-decoration:underline}
+@media(max-width:680px){.map-section{display:none}}
 @media(max-width:680px){
   .bottom-row{grid-template-columns:1fr}
   .sn{font-size:56px}
@@ -225,6 +238,11 @@ footer a:hover{color:var(--muted)}
   <div id="vehicleList"><div class="nodata">Loading vehicles...</div></div>
 </div>
 
+<div class="map-section">
+  <div class="section-label">Raptor locations — 100-mile radius · Midland TX</div>
+  <div id="raptorMap"></div>
+</div>
+
 <div class="dealer-section">
   <div class="section-label">Ford dealers within 100 miles of Midland TX</div>
   <div id="dealerTableWrap"><div class="nodata">Loading dealers...</div></div>
@@ -294,7 +312,7 @@ async function loadData(){
       return;
     }
 
-    renderStats();renderVehs();renderDealerTable();renderChart();renderDons(d.totalDonatedCents||0);
+    renderStats();renderVehs();renderMap();renderDealerTable();renderChart();renderDons(d.totalDonatedCents||0);
 
     const l=snaps[snaps.length-1];
     const ds=new Date(l.snap_date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
@@ -384,6 +402,99 @@ function renderVehs(){
       +'<span class="vlink">'+lk+'</span></div>';
   }).join('');
   document.getElementById('vehicleList').innerHTML=hdr+rows;
+}
+
+function renderMap(){
+  // Dealer known coords fallback (in case Supabase doesn't have lat/lng yet)
+  const fallback={
+    'Rogers Ford Sales':      [31.9716,-102.1235],
+    'Sewell Ford':            [31.8457,-102.3676],
+    'Star Ford Of Big Spring':[32.2504,-101.4788],
+    'Premier Ford Of Lamesa': [32.7379,-101.9566],
+    'Bailey Toliver Ford':    [32.1262,-101.7896],
+    'Permian Ford':           [32.3196,-102.5524],
+    'Smith Auto Family Ford': [33.5879,-102.3779],
+    'Stanley Ford Sweetwater':[32.4710,-100.4054],
+  };
+
+  if(typeof L==='undefined') return; // Leaflet not loaded yet
+
+  const mapEl=document.getElementById('raptorMap');
+  if(!mapEl) return;
+
+  // Destroy existing map if re-rendering
+  if(window._raptorMap) window._raptorMap.remove();
+
+  const map=L.map('raptorMap',{
+    center:[31.9716,-102.0779], // Midland TX
+    zoom:8,
+    zoomControl:true,
+  });
+  window._raptorMap=map;
+
+  // Dark tile layer — CartoDB dark matter, no API key needed
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    attribution:'&copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains:'abcd',
+    maxZoom:19
+  }).addTo(map);
+
+  // Midland center marker
+  L.circleMarker([31.9716,-102.0779],{
+    radius:6,color:'#f0a500',fillColor:'#f0a500',fillOpacity:0.3,weight:2
+  }).addTo(map).bindTooltip('Midland TX — search center',{direction:'top'});
+
+  // 100-mile radius circle (~160km)
+  L.circle([31.9716,-102.0779],{
+    radius:160934,color:'#f0a500',fillColor:'#f0a500',
+    fillOpacity:0.03,weight:1,dashArray:'4 6'
+  }).addTo(map);
+
+  if(!vehs.length) return;
+
+  // Custom gold truck icon
+  const truckIcon=L.divIcon({
+    className:'',
+    html:`<div style="background:#c8860a;border:2px solid #f0a500;width:12px;height:12px;border-radius:50%;box-shadow:0 0 6px rgba(240,165,0,0.6)"></div>`,
+    iconSize:[12,12],iconAnchor:[6,6]
+  });
+
+  // Cluster group
+  const markers=L.markerClusterGroup({
+    maxClusterRadius:40,
+    iconCreateFunction:function(cluster){
+      const n=cluster.getChildCount();
+      return L.divIcon({
+        html:`<div style="background:#c8860a;border:2px solid #f0a500;color:#000;font-family:var(--display);font-size:14px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(240,165,0,0.5)">${n}</div>`,
+        className:'',iconSize:[32,32],iconAnchor:[16,16]
+      });
+    }
+  });
+
+  // Add a marker per vehicle
+  for(const v of vehs){
+    let lat=v.dealer_lat, lng=v.dealer_lng;
+    if(!lat||!lng){
+      const fb=fallback[v.dealer_name];
+      if(fb){lat=fb[0];lng=fb[1];}
+      else continue;
+    }
+    // Tiny jitter so overlapping pins spread slightly
+    const jlat=lat+(Math.random()-0.5)*0.008;
+    const jlng=lng+(Math.random()-0.5)*0.008;
+    const url=safeUrl(v.vehicle_url);
+    const price=v.msrp?'$'+Math.round(v.msrp/1000)+'k':'—';
+    const popup=`<div class="raptor-popup">
+      <strong>F-150 RAPTOR</strong>
+      ${esc(v.dealer_name)}<br>
+      ${esc(v.dealer_city||'')}<br>
+      ${price}
+      ${url?`<br><a href="${esc(url)}" target="_blank" rel="noopener">VIEW LISTING →</a>`:''}
+    </div>`;
+    L.marker([jlat,jlng],{icon:truckIcon}).bindPopup(popup).addTo(markers);
+  }
+
+  map.addLayer(markers);
 }
 
 function renderDealerTable(){
