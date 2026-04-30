@@ -1,7 +1,5 @@
-// /api/cron — daily scrape via Anthropic API web search
-// The Anthropic search takes ~20-30s which exceeds Vercel free tier 10s limit
-// Solution: respond 200 immediately, then do the work with waitUntil if available
-// OR: use a background fetch to itself (fire-and-forget pattern)
+// /api/cron — runs synchronously, waits for full result before responding
+// Vercel cron jobs get 60s even on free tier (unlike regular functions which get 10s)
 
 import { scrapeRaptors, fetchWTI, generateCommentary } from '../lib/scraper.js';
 import { supabase } from '../lib/supabase.js';
@@ -12,96 +10,88 @@ export default async function handler(req, res) {
   }
 
   const today = new Date().toISOString().split('T')[0];
-  console.log(`[cron] ${today} — starting scrape`);
+  console.log(`[cron] ${today} — starting`);
 
-  // Respond immediately so Vercel doesn't kill the connection
-  // The function continues running in the background
-  res.status(200).json({ accepted: true, date: today, message: 'Scrape started — check Supabase in ~30s' });
+  // Run scrape and WTI fetch in parallel, wait for both
+  const [invResult, wtiResult] = await Promise.allSettled([
+    scrapeRaptors(),
+    fetchWTI(),
+  ]);
 
-  // Now do the actual work after responding
-  // Note: on Vercel free tier the function may still be killed after 10s
-  // If that happens, upgrade to Hobby ($20) which gives 60s
-  try {
-    // Add ANTHROPIC_API_KEY to the fetch headers via env
-    const [invResult, wtiResult] = await Promise.allSettled([
-      scrapeRaptors(),
-      fetchWTI(),
-    ]);
+  const inv = invResult.status === 'fulfilled'
+    ? invResult.value
+    : { total: 0, raptor: 0, raptorR: 0, vehicles: [], dealers: [], hasData: false };
 
-    const inv = invResult.status === 'fulfilled'
-      ? invResult.value
-      : { total: 0, raptor: 0, raptorR: 0, vehicles: [], dealers: [], hasData: false };
+  const wti = wtiResult.status === 'fulfilled'
+    ? wtiResult.value
+    : { price: null, prevPrice: null, change: null };
 
-    const wti = wtiResult.status === 'fulfilled'
-      ? wtiResult.value
-      : { price: null, prevPrice: null, change: null };
-
-    if (invResult.status === 'rejected') console.error('[cron] Scrape error:', invResult.reason?.message);
-
-    console.log(`[cron] Found ${inv.total} vehicles, WTI $${wti.price}`);
-
-    const commentary = generateCommentary(inv.total, wti);
-
-    // Write snapshot
-    const { error: snapErr } = await supabase
-      .from('snapshots')
-      .upsert({
-        snap_date:  today,
-        total:      inv.total,
-        raptor:     inv.raptor,
-        raptor_r:   inv.raptorR,
-        wti_price:  wti.price,
-        commentary,
-        scraped_at: new Date().toISOString(),
-      }, { onConflict: 'snap_date' });
-
-    if (snapErr) console.error('[cron] Snapshot error:', snapErr.message);
-
-    // Bulk upsert vehicles
-    if (inv.vehicles.length > 0) {
-      const rows = inv.vehicles.map(v => ({
-        vin:          v.vin || `NVIN-${v.dealer_name}-${v.trim}-${Date.now()}`.slice(0,17),
-        model_year:   v.model_year,
-        model:        v.model,
-        trim:         v.trim,
-        color:        v.color,
-        msrp:         v.msrp,
-        dealer_name:  v.dealer_name,
-        dealer_city:  v.dealer_city,
-        dealer_state: v.dealer_state || 'TX',
-        dealer_url:   v.dealer_url,
-        vehicle_url:  v.vehicle_url,
-        first_seen:   today,
-        last_seen:    today,
-        active:       true,
-      }));
-
-      const { error: vErr } = await supabase
-        .from('vehicles')
-        .upsert(rows, { onConflict: 'vin', ignoreDuplicates: false });
-      if (vErr) console.error('[cron] Vehicle upsert error:', vErr.message);
-
-      // Daily log
-      const dailyRows = inv.vehicles
-        .filter(v => v.vin)
-        .map(v => ({ snap_date: today, vin: v.vin, dealer_name: v.dealer_name }));
-      if (dailyRows.length > 0) {
-        await supabase.from('vehicle_daily')
-          .upsert(dailyRows, { onConflict: 'snap_date,vin', ignoreDuplicates: true });
-      }
-
-      // Mark missing VINs inactive
-      const activeVins = inv.vehicles.filter(v => v.vin).map(v => v.vin);
-      if (activeVins.length > 0) {
-        await supabase.from('vehicles')
-          .update({ active: false })
-          .eq('active', true)
-          .not('vin', 'in', `(${activeVins.map(v => `"${v}"`).join(',')})`);
-      }
-    }
-
-    console.log('[cron] Complete ✓');
-  } catch (err) {
-    console.error('[cron] Fatal error:', err.message);
+  if (invResult.status === 'rejected') {
+    console.error('[cron] scrape error:', invResult.reason?.message);
   }
+
+  console.log(`[cron] found ${inv.total} vehicles, WTI $${wti.price}`);
+
+  const commentary = inv.commentary || generateCommentary(inv.total, wti);
+
+  // Save snapshot
+  const { error: snapErr } = await supabase
+    .from('snapshots')
+    .upsert({
+      snap_date:  today,
+      total:      inv.total,
+      raptor:     inv.raptor,
+      raptor_r:   inv.raptorR,
+      wti_price:  wti.price,
+      commentary,
+      scraped_at: new Date().toISOString(),
+    }, { onConflict: 'snap_date' });
+
+  if (snapErr) console.error('[cron] snapshot error:', snapErr.message);
+
+  // Save vehicles
+  if (inv.vehicles.length > 0) {
+    const rows = inv.vehicles.map((v, i) => ({
+      vin:          v.vin || `SRCH-${today}-${i}`.padEnd(17, '0').slice(0, 17),
+      model_year:   v.model_year,
+      model:        v.model,
+      trim:         v.trim,
+      color:        v.color || null,
+      msrp:         v.msrp || null,
+      dealer_name:  v.dealer_name,
+      dealer_city:  v.dealer_city,
+      dealer_state: v.dealer_state || 'TX',
+      dealer_url:   v.dealer_url || null,
+      vehicle_url:  v.vehicle_url || null,
+      first_seen:   today,
+      last_seen:    today,
+      active:       true,
+    }));
+
+    const { error: vErr } = await supabase
+      .from('vehicles')
+      .upsert(rows, { onConflict: 'vin', ignoreDuplicates: false });
+    if (vErr) console.error('[cron] vehicle error:', vErr.message);
+
+    // Mark old VINs inactive
+    const vins = rows.map(r => r.vin).filter(v => !v.startsWith('SRCH'));
+    if (vins.length > 0) {
+      await supabase.from('vehicles')
+        .update({ active: false })
+        .eq('active', true)
+        .not('vin', 'in', `(${vins.map(v => `"${v}"`).join(',')})`);
+    }
+  }
+
+  console.log('[cron] complete');
+
+  return res.status(200).json({
+    success:  true,
+    date:     today,
+    total:    inv.total,
+    raptor:   inv.raptor,
+    raptorR:  inv.raptorR,
+    wti:      wti.price,
+    vehicles: inv.vehicles.length,
+  });
 }
