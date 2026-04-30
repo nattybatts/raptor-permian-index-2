@@ -108,6 +108,13 @@ header{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 2
 .sig-bg{height:10px;background:var(--bg2);border-radius:5px;overflow:hidden}
 .sig-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#1e5c20,#c8860a,#7a1a1a);transition:width 1s ease}
 .sig-txt{font-size:12px;color:var(--text);margin-top:6px}
+.days-metrics{background:var(--bg1);border-bottom:1px solid var(--border);display:grid;grid-template-columns:repeat(7,auto);align-items:center;padding:10px 20px;gap:0}
+.dm-item{padding:8px 16px;text-align:center}
+.dm-label{font-size:8px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
+.dm-val{font-family:var(--display);font-size:28px;color:var(--gold);line-height:1}
+.dm-sub{font-size:9px;color:var(--faint);margin-top:2px}
+.dm-sep{width:1px;height:36px;background:var(--border2)}
+@media(max-width:680px){.days-metrics{grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}.dm-item{background:var(--bg1)}.dm-sep{display:none}}
 .chart-section{background:var(--bg1);padding:14px 20px;border-bottom:1px solid var(--border)}
 .section-label{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
 .cleg{display:flex;gap:16px;margin-bottom:8px}
@@ -284,6 +291,32 @@ footer a:hover{color:var(--muted)}
   </div>
 </div>
 
+<div class="days-metrics">
+  <div class="dm-item">
+    <div class="dm-label">AVG DAYS ON LOT</div>
+    <div class="dm-val" id="dmAvgActive">—</div>
+    <div class="dm-sub">current inventory</div>
+  </div>
+  <div class="dm-sep"></div>
+  <div class="dm-item">
+    <div class="dm-label">ROLLING AVG</div>
+    <div class="dm-val" id="dmAvgAll">—</div>
+    <div class="dm-sub">incl. sold / delisted</div>
+  </div>
+  <div class="dm-sep"></div>
+  <div class="dm-item">
+    <div class="dm-label">MEDIAN</div>
+    <div class="dm-val" id="dmMedian">—</div>
+    <div class="dm-sub">days on lot</div>
+  </div>
+  <div class="dm-sep"></div>
+  <div class="dm-item">
+    <div class="dm-label">LONGEST SITTING</div>
+    <div class="dm-val" id="dmMax">—</div>
+    <div class="dm-sub">days on a lot</div>
+  </div>
+</div>
+
 <div class="chart-section">
   <div class="section-label">90-day trend — rising = bad, falling = good</div>
   <div class="cleg">
@@ -373,7 +406,7 @@ async function loadData(){
       return;
     }
 
-    renderStats();renderVehs();renderMap();renderDealerTable();renderChart();renderDons(d.totalDonatedCents||0);
+    renderStats();renderVehs();renderMap();renderDaysMetrics(d.daysMetrics);renderDealerTable();renderChart();renderDons(d.totalDonatedCents||0);
 
     const l=snaps[snaps.length-1];
     const ds=new Date(l.snap_date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
@@ -461,7 +494,7 @@ function renderVehs(){
       +'<span class="vtrim">RAPTOR</span>'
       +'<span class="vdeal">'+esc(v.dealer_name)+'<br><span style="font-size:9px;color:var(--faint)">'+esc(v.dealer_city||'')+'</span></span>'
       +price
-      +'<span class="vdays">'+(d===0?'Today':d+'d')+'</span>'
+      +'<span class="vdays">'+(v.days_on_lot!=null?v.days_on_lot+'d':'—')+'</span>'
       +'<span class="vlink">'+lk+'</span>'
       +rowClose;
   }).join('');
@@ -559,6 +592,15 @@ function renderMap(){
   }
 
   map.addLayer(markers);
+}
+
+function renderDaysMetrics(m){
+  if(!m) return;
+  const set=(id,v)=>{if(v!=null)document.getElementById(id).textContent=v+'d';};
+  set('dmAvgActive', m.avgActive);
+  set('dmAvgAll',    m.avgAll);
+  set('dmMedian',    m.median);
+  set('dmMax',       m.max);
 }
 
 function renderDealerTable(){
