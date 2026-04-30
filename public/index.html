@@ -86,6 +86,8 @@ header{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 2
 #vehicleList{display:flex;flex-direction:column;gap:1px}
 .vr{background:var(--bg1);display:grid;grid-template-columns:90px 82px 1fr 90px 70px 86px;align-items:center;gap:8px;padding:9px 12px;font-size:10px;color:var(--muted);border-left:3px solid transparent;transition:all .12s}
 .vr:hover{border-left-color:var(--gold-dim);background:var(--bg2)}
+.vr-link{text-decoration:none;color:inherit;cursor:pointer}
+.vr-link:hover{border-left-color:var(--gold-dim);background:var(--bg2)}
 .vvin{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px}
 .vtrim{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;color:var(--gold);background:#1a1000;border:1px solid #3a2500}
 .vdeal{color:#999;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -406,12 +408,15 @@ function renderVehs(){
     const vin=v.vin?esc(v.vin.slice(0,4))+'…'+esc(v.vin.slice(-4)):'—';
     const url=safeUrl(v.vehicle_url);
     const lk=url?'<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">VIEW →</a>':'<span style="color:#222">—</span>';
-    return '<div class="vr"><span class="vvin">'+vin+'</span>'
+    const rowOpen=url?'<a class="vr vr-link" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">':'<div class="vr">';
+    const rowClose=url?'</a>':'</div>';
+    return rowOpen+'<span class="vvin">'+vin+'</span>'
       +'<span class="vtrim">RAPTOR</span>'
       +'<span class="vdeal">'+esc(v.dealer_name)+'<br><span style="font-size:9px;color:var(--faint)">'+esc(v.dealer_city||'')+'</span></span>'
       +price
       +'<span class="vdays">'+(d===0?'Today':d+'d')+'</span>'
-      +'<span class="vlink">'+lk+'</span></div>';
+      +'<span class="vlink">'+lk+'</span>'
+      +rowClose;
   }).join('');
   document.getElementById('vehicleList').innerHTML=hdr+rows;
 }
