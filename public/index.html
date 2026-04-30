@@ -79,6 +79,22 @@ header{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 2
 .don-raised-inline{display:flex;flex-direction:column;align-items:flex-end;margin-left:6px;flex-shrink:0}
 .dt-raised{font-family:var(--display);font-size:22px;color:var(--gold-dim);line-height:1}
 .dt-raised-lbl{font-size:7px;color:var(--faint);letter-spacing:2px;text-transform:uppercase}
+.sold-btn{background:transparent;border:1px solid #3a1515;color:#c05050;font-family:var(--mono);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .15s}
+.sold-btn:hover{border-color:#e05555;color:#e05555}
+.sold-table{width:100%;border-collapse:collapse}
+.sold-table th{font-size:8px;color:var(--faint);letter-spacing:2px;text-transform:uppercase;padding:8px 16px;text-align:left;border-bottom:1px solid var(--border)}
+.sold-table th:nth-child(n+4){text-align:right}
+.sold-row{border-bottom:1px solid #111;transition:background .1s}
+.sold-row:hover{background:var(--bg2);cursor:pointer}
+.sold-row td{padding:9px 16px;font-size:11px;color:var(--muted);vertical-align:middle}
+.sold-vin{font-size:9px;color:var(--faint);letter-spacing:1px}
+.sold-trim{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px}
+.sold-trim.r{color:#ff7070;background:#1a0808;border:1px solid #3a1515}
+.sold-trim.b{color:#888;background:#141414;border:1px solid #2a2a2a}
+.sold-price{text-align:right;font-family:var(--display);font-size:18px;color:#666}
+.sold-days{text-align:right;font-size:10px;color:var(--faint)}
+.sold-date{text-align:right;font-size:10px;color:var(--faint)}
+.sold-dealer{color:#777;font-size:10px}
 .show-all-btn{background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:1px;margin-top:6px;transition:all .15s}
 .show-all-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
 .veh-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:1001;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
@@ -338,6 +354,20 @@ footer a:hover{color:var(--muted)}
   <button class="show-all-btn" id="showAllBtn" onclick="showAllDonations()" style="display:none">SHOW ALL DONATIONS →</button>
 </div>
 
+<!-- Recently Sold Modal -->
+<div class="veh-modal" id="soldModal" onclick="if(event.target===this)closeSoldModal()">
+  <div class="veh-modal-inner">
+    <div class="veh-modal-header">
+      <div>
+        <div class="veh-modal-title">RECENTLY SOLD / DELISTED</div>
+        <div class="veh-modal-sub">Vehicles no longer in active inventory · last 60 days</div>
+      </div>
+      <button class="veh-modal-close" onclick="closeSoldModal()">✕</button>
+    </div>
+    <div class="veh-modal-body" id="soldBody"></div>
+  </div>
+</div>
+
 <!-- Donations modal -->
 <div class="don-modal" id="donModal" onclick="if(event.target===this)closeDonModal()">
   <div class="don-modal-inner">
@@ -402,7 +432,10 @@ footer a:hover{color:var(--muted)}
 </div>
 
 <div class="vehicles-section">
-  <div class="section-label">Active vehicles on lots · VIN-verified · click to view at dealer</div>
+  <div class="section-label" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <span>Active vehicles on lots · VIN-verified · click to view at dealer</span>
+    <button class="sold-btn" id="soldBtn" onclick="openSoldModal()" style="display:none">RECENTLY SOLD (<span id="soldCount">0</span>) →</button>
+  </div>
   <div id="vehicleList"><div class="nodata">Loading vehicles...</div></div>
 </div>
 
@@ -497,6 +530,11 @@ async function loadData(){
       return;
     }
 
+    soldVehicles = d.recentlySold || [];
+    if(soldVehicles.length > 0){
+      document.getElementById('soldBtn').style.display='inline-block';
+      document.getElementById('soldCount').textContent = soldVehicles.length;
+    }
     renderStats();renderVehs();renderMap();renderDaysMetrics(d.daysMetrics);renderDealerTable();renderChart();renderDons(d.totalDonatedCents||0);
 
     const l=snaps[snaps.length-1];
@@ -888,6 +926,46 @@ async function openVehModal(vin, vehicleData){
   }catch(e){
     body.innerHTML='<div class="vm-loading">Error loading details: '+esc(e.message)+'</div>';
   }
+}
+
+// Recently Sold
+let soldVehicles = [];
+
+function openSoldModal(){
+  const body = document.getElementById('soldBody');
+  if(!soldVehicles.length){
+    body.innerHTML='<div class="vm-loading">No recently sold vehicles in the last 60 days.</div>';
+  } else {
+    const rows = soldVehicles.map(v => {
+      const isRR = (v.engine_size >= 5.0)||(v.trim==='Raptor R');
+      const vin = v.vin ? esc(v.vin.slice(0,4))+'…'+esc(v.vin.slice(-4)) : '—';
+      const price = v.msrp ? '$'+Math.round(v.msrp/1000)+'k' : '—';
+      const lastSeen = v.last_seen ? new Date(v.last_seen+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+      const firstListed = v.first_listed ? v.first_listed : v.first_seen;
+      const daysOnLot = firstListed
+        ? Math.floor((new Date(v.last_seen+'T12:00:00') - new Date(firstListed+'T12:00:00')) / 864e5)
+        : (v.days_on_lot || 0);
+      const url = safeUrl(v.vehicle_url);
+      return '<tr class="sold-row"'+(url?' onclick="window.open(''+esc(url)+'','_blank')"':'')+'>'+
+        '<td class="sold-vin">'+vin+'</td>'+
+        '<td><span class="sold-trim '+(isRR?'r':'b')+'">'+(isRR?'RAPTOR R':'RAPTOR')+'</span></td>'+
+        '<td class="sold-dealer">'+esc(v.dealer_name||'')+'<br><span style="font-size:9px;color:var(--faint)">'+esc(v.dealer_city||'')+'</span></td>'+
+        '<td class="sold-price">'+price+'</td>'+
+        '<td class="sold-days">'+(daysOnLot>0?daysOnLot+'d':'—')+'</td>'+
+        '<td class="sold-date">'+lastSeen+'</td>'+
+        '</tr>';
+    }).join('');
+    body.innerHTML = '<div style="padding:0"><table class="sold-table">'+
+      '<thead><tr><th>VIN</th><th>TRIM</th><th>DEALER</th><th>PRICE</th><th>DAYS ON LOT</th><th>LAST SEEN</th></tr></thead>'+
+      '<tbody>'+rows+'</tbody></table></div>';
+  }
+  document.getElementById('soldModal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeSoldModal(){
+  document.getElementById('soldModal').classList.remove('open');
+  document.body.style.overflow='';
 }
 
 function closeVehModal(){
