@@ -183,11 +183,8 @@ footer a:hover{color:var(--muted)}
   .vh{grid-template-columns:70px 1fr auto auto}
   .vdays{font-size:9px;color:var(--muted)}
   .vmsrp{font-size:16px}
-  /* Hide heavy sections on mobile */
+  /* Hide chart on mobile only */
   .chart-section{display:none}
-  .dealer-section{display:none}
-  .map-section{display:none}
-  .bottom-row{display:none}
   /* Friend bar — hide button, keep text */
   .friend-bar .friend-btn{display:none}
   /* Donate strip — compact on mobile */
@@ -481,7 +478,7 @@ function renderVehs(){
   }
   const today=new Date();
   const days=s=>s?Math.floor((today-new Date(s+'T12:00:00'))/(864e5)):0;
-  const hdr='<div class="vr vh"><span>VIN</span><span>TRIM</span><span>DEALER</span><span style="text-align:right">PRICE</span><span style="text-align:right">DAYS</span><span></span></div>';
+  const hdr='<div class="vr vh"><span>VIN</span><span>TRIM</span><span>DEALER</span><span style="text-align:right">PRICE</span><span style="text-align:right">DAYS ON LOT</span><span></span></div>';
   const rows=vehs.map(v=>{
     const d=days(v.first_seen);
     const price=v.msrp?'<span class="vmsrp">$'+Math.round(v.msrp/1000)+'k</span>':'<span class="vmsrp no-price">—</span>';
