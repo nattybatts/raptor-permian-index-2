@@ -178,9 +178,10 @@ footer a:hover{color:var(--muted)}
   .sn{font-size:56px}
   header,.price-strip,.vehicles-section,.dealer-section,.pane,.donate-strip,.stats-signal,.signal-card,.chart-section,.map-section{padding:10px 14px}
   /* Vehicle rows: just TRIM | DEALER | PRICE on mobile */
-  .vr{grid-template-columns:70px 1fr auto;gap:6px;padding:10px 14px}
-  .vdays,.vlink,.vvin,.vh span:nth-child(1),.vh span:nth-child(5),.vh span:nth-child(6){display:none}
-  .vh{grid-template-columns:70px 1fr auto}
+  .vr{grid-template-columns:70px 1fr auto auto;gap:6px;padding:10px 14px}
+  .vlink,.vvin,.vh span:nth-child(1),.vh span:nth-child(5),.vh span:nth-child(6){display:none}
+  .vh{grid-template-columns:70px 1fr auto auto}
+  .vdays{font-size:9px;color:var(--muted)}
   .vmsrp{font-size:16px}
   /* Hide heavy sections on mobile */
   .chart-section{display:none}
