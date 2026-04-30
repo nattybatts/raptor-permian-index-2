@@ -42,29 +42,29 @@ header{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 2
 .pl{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
 .pv{font-family:var(--display);font-size:26px;color:var(--gold)}
 .vsep{color:var(--faint)}
-.donate-strip{background:#0c0900;border-bottom:1px solid #2a1f00;padding:10px 20px}
-.donate-strip-inner{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.dt-label{font-family:var(--display);font-size:15px;color:var(--gold);letter-spacing:2px;white-space:nowrap}
-.dt-raised{font-family:var(--display);font-size:22px;color:var(--gold-dim);white-space:nowrap}
-.dt-raised-lbl{font-size:8px;color:var(--faint);display:block;letter-spacing:2px;margin-top:-3px}
-.amts{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
-.ab{background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:10px;padding:5px 10px;cursor:pointer;letter-spacing:1px;transition:all .15s}
+.donate-strip{background:#0c0900;border-bottom:1px solid #2a1f00;padding:8px 20px}
+.donate-strip-inner{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dt-label{font-family:var(--display);font-size:14px;color:var(--gold);letter-spacing:2px;white-space:nowrap}
+.dt-raised{font-family:var(--display);font-size:20px;color:var(--gold-dim);white-space:nowrap}
+.dt-raised-lbl{font-size:7px;color:var(--faint);display:block;letter-spacing:2px;margin-top:-3px}
+.amts{display:flex;gap:4px;align-items:center;flex-shrink:0}
+.ab{background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:10px;padding:4px 9px;cursor:pointer;letter-spacing:1px;transition:all .15s}
 .ab.on{background:#1a1100;color:var(--gold);border-color:var(--gold-dim)}
 .ab:hover:not(.on){background:var(--bg2);color:#bbb}
-.dt-other{background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:10px;padding:5px 8px;outline:none;width:70px;display:none}
+.dt-other{background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:10px;padding:4px 6px;outline:none;width:60px;display:none}
 .dt-other.show{display:inline-block}
 .dt-other:focus{border-color:var(--gold-dim)}
-.dt-fields{display:flex;gap:6px;flex-wrap:wrap;align-items:center;flex:1;min-width:200px}
-.dt-input{background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:10px;padding:6px 10px;outline:none;flex:1;min-width:100px}
+.dt-fields{display:flex;gap:5px;align-items:center;flex:1;min-width:180px}
+.dt-input{background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:10px;padding:5px 8px;outline:none;flex:1;min-width:80px}
 .dt-input:focus{border-color:var(--gold-dim)}
 .dt-input::placeholder{color:var(--faint)}
-.paybtn{background:var(--gold-dim);border:none;color:#000;font-family:var(--mono);font-size:10px;font-weight:700;padding:7px 14px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;transition:background .15s}
+.paybtn{background:var(--gold-dim);border:none;color:#000;font-family:var(--mono);font-size:10px;font-weight:700;padding:6px 12px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;transition:background .15s}
 .paybtn:hover{background:var(--gold)}
 .paybtn:disabled{opacity:.4;cursor:not-allowed}
-.donate-feed{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-.dfi{display:flex;align-items:center;gap:6px;padding:2px 8px;background:var(--bg2);font-size:10px;color:var(--dim)}
-.dfa{font-family:var(--display);font-size:15px;color:var(--gold-dim)}
-.dsuccess{color:var(--green);font-size:11px;margin-top:5px;display:none}
+.donate-feed{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.dfi{display:flex;align-items:center;gap:5px;padding:2px 7px;background:var(--bg2);font-size:10px;color:var(--dim)}
+.dfa{font-family:var(--display);font-size:14px;color:var(--gold-dim)}
+.dsuccess{color:var(--green);font-size:11px;margin-top:4px;display:none}
 .show-all-btn{background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:1px;margin-top:6px;transition:all .15s}
 .show-all-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
 .don-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;align-items:center;justify-content:center;padding:20px}
@@ -169,12 +169,18 @@ footer a:hover{color:var(--muted)}
   .bottom-row{display:none}
   /* Friend bar — hide button, keep text */
   .friend-bar .friend-btn{display:none}
-  /* Donate strip — stack vertically */
-  .donate-strip-inner{flex-direction:column;align-items:stretch;gap:10px}
-  .dt-label{font-size:13px}
-  .amts{justify-content:flex-start}
-  .dt-fields{flex-direction:column;align-items:stretch}
-  .dt-input,.paybtn{width:100%}
+  /* Donate strip — compact on mobile */
+  .donate-strip{padding:6px 14px}
+  .donate-strip-inner{gap:6px}
+  .dt-label{font-size:12px}
+  .dt-raised{font-size:16px}
+  .amts{gap:3px}
+  .ab{padding:3px 7px;font-size:9px}
+  .dt-fields{flex-wrap:wrap}
+  .dt-input{min-width:0;flex:1;font-size:9px;padding:4px 7px}
+  #dname,#dmsg{display:none}
+  .paybtn{width:100%;margin-top:2px;padding:8px}
+
   /* Signal bar — tighten */
   .stats-signal{gap:12px}
   .sig-divider{display:none}
@@ -198,20 +204,24 @@ footer a:hover{color:var(--muted)}
 </div>
 <div class="donate-strip">
   <div class="donate-strip-inner">
-    <div>
-      <div class="dt-label">DONATE TO @REALPETE2020'S RAPTOR FUND</div>
-      <div style="font-size:9px;color:var(--faint);margin-top:2px">Apple Pay &amp; all cards · powered by Stripe</div>
-    </div>
-    <div style="text-align:right">
-      <div class="dt-raised" id="dtAmt">$0</div>
-      <span class="dt-raised-lbl">RAISED</span>
-    </div>
-    <div class="amts">
-      <button class="ab on" onclick="selAmt(500,this)">$5</button>
-      <button class="ab" onclick="selAmt(2500,this)">$25</button>
-      <button class="ab" onclick="selAmt(10000,this)">$100</button>
-      <button class="ab" id="otherBtn" onclick="selOther(this)">OTHER</button>
-      <input class="dt-other" id="otherAmt" type="number" min="1" max="500" placeholder="$" oninput="setOther(this)">
+    <div class="don-top-row">
+      <div>
+        <div class="dt-label">DONATE TO @REALPETE2020'S RAPTOR FUND</div>
+        <div style="font-size:9px;color:var(--faint);margin-top:2px">Apple Pay &amp; all cards · powered by Stripe</div>
+      </div>
+      <div class="don-raised-amts">
+        <div style="text-align:right;margin-right:10px">
+          <div class="dt-raised" id="dtAmt">$0</div>
+          <span class="dt-raised-lbl">RAISED</span>
+        </div>
+        <div class="amts">
+          <button class="ab on" onclick="selAmt(500,this)">$5</button>
+          <button class="ab" onclick="selAmt(2500,this)">$25</button>
+          <button class="ab" onclick="selAmt(10000,this)">$100</button>
+          <button class="ab" id="otherBtn" onclick="selOther(this)">OTHER</button>
+          <input class="dt-other" id="otherAmt" type="number" min="1" max="500" placeholder="$" oninput="setOther(this)">
+        </div>
+      </div>
     </div>
     <div class="dt-fields">
       <input class="dt-input" id="dname" type="text" placeholder="Name (optional)" maxlength="60" autocomplete="off">
@@ -235,20 +245,6 @@ footer a:hover{color:var(--muted)}
   </div>
 </div>
 
-<div class="lbanner" id="lb">LOADING INVENTORY DATA...</div>
-
-<div class="price-strip">
-  <div class="pb"><span class="pl">WTI</span><span class="pv" id="wtiV">—</span></div>
-  <span class="vsep">|</span>
-  <div class="pb"><span class="pl">Brent</span><span class="pv" id="brtV">—</span></div>
-  <span class="vsep">|</span>
-  <div class="pb"><span class="pl">Updated</span><span style="font-size:11px;color:var(--muted)" id="asOf">—</span></div>
-</div>
-
-
-<div class="lbanner" id="lb">LOADING INVENTORY DATA...</div>
-
-
 
 <div class="stats-signal">
   <div>
@@ -264,7 +260,425 @@ footer a:hover{color:var(--muted)}
     <div class="sig-ends"><span>LOW STOCK = BOOM ▶</span><span>◀ HIGH STOCK = BUST</span></div>
     <div class="sig-bg"><div class="sig-fill" id="sigF" style="width:50%"></div></div>
   </div>
+</div
+
+<div class="stats-signal">
+  <div>
+    <div class="sl">F-150 Raptors in stock · 100mi · Midland TX</div>
+    <div class="sn" id="tot">—</div>
+  </div>
+  <div class="count-meta">
+    <div class="ss fl" id="totD">loading...</div>
+    <div class="sig-txt" id="sigT" style="font-size:11px;margin-top:0;font-weight:normal;color:var(--muted)">Awaiting data...</div>
+  </div>
+  <div class="sig-divider"></div>
+  <div class="sig-wrap">
+    <div class="sig-ends"><span>LOW STOCK = BOOM ▶</span><span>◀ HIGH STOCK = BUST</span></div>
+    <div class="sig-bg"><div class="sig-fill" id="sigF" style="width:50%"></div></div>
+  </div>
+</div
+
+<div class="lbanner" id="lb">LOADING INVENTORY DATA...</div>
+
+<div class="price-strip">
+  <div class="pb"><span class="pl">WTI</span><span class="pv" id="wtiV">—</span></div>
+  <span class="vsep">|</span>
+  <div class="pb"><span class="pl">Brent</span><span class="pv" id="brtV">—</span></div>
+  <span class="vsep">|</span>
+  <div class="pb"><span class="pl">Updated</span><span style="font-size:11px;color:var(--muted)" id="asOf">—</span></div>
 </div>
+
+
+<div class="lbanner" id="lb">LOADING INVENTORY DATA...</div>
+
+>
+
+<div class="chart-section">
+  <div class="section-label">90-day trend — rising = bad, falling = good</div>
+  <div class="cleg">
+    <div class="cli"><div class="cll" style="background:#f0a500"></div>Raptors in stock</div>
+  </div>
+  <div style="position:relative;width:100%;height:160px">
+    <canvas id="tC"></canvas>
+  </div>
+</div>
+
+<div class="vehicles-section">
+  <div class="section-label">Active vehicles on lots · VIN-verified · click to view at dealer</div>
+  <div id="vehicleList"><div class="nodata">Loading vehicles...</div></div>
+</div>
+
+<div class="map-section">
+  <div class="section-label">Raptor locations — 100-mile radius · Midland TX</div>
+  <div id="raptorMap"></div>
+</div>
+
+<div class="dealer-section">
+  <div class="section-label">Ford dealers within 100 miles of Midland TX</div>
+  <div id="dealerTableWrap"><div class="nodata">Loading dealers...</div></div>
+</div>
+
+<div class="bottom-row">
+  <div class="pane">
+    <div class="section-label">Field Notes</div>
+    <div class="cq" id="fNotes">"When WTI's above $80, every roughneck's got a Raptor on order and the lots are bare. When it drops to $55, the trucks start stacking up. The Permian giveth and the Permian taketh away."</div>
+    <div style="margin-top:12px;font-size:9px;color:var(--faint);line-height:2">
+      F-150 Raptor only · new inventory only<br>
+      100-mile radius · Midland TX 79701 · updated 8AM CT daily<br>
+      Data via Marketcheck API
+    </div>
+  </div>
+  <div class="pane">
+    <div class="section-label">Index Guide</div>
+    <table class="stbl">
+      <tr><td>0–8 trucks</td><td style="color:var(--green)">BOOM · Basin hot, lots bare</td></tr>
+      <tr><td>8–20 trucks</td><td style="color:#6aaf50">STRONG · money moving</td></tr>
+      <tr><td>20–40 trucks</td><td style="color:var(--muted)">NEUTRAL · watch the trend</td></tr>
+      <tr><td>40–60 trucks</td><td style="color:#c8860a">COOLING · spending slows</td></tr>
+      <tr><td>60–80 trucks</td><td style="color:var(--red)">SLOW · crews getting cut</td></tr>
+      <tr><td>80+ trucks</td><td style="color:#ff5555">BUST · repo man's busy</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="status-bar">
+  <span class="smsg" id="smsg">Loading inventory data...</span>
+  <span id="dtrk" style="color:var(--faint);white-space:nowrap"></span>
+</div>
+
+<footer>
+  <span>PERMIAN RAPTOR INDEX &copy; <span id="yr"></span></span>
+  <span>F-150 Raptor · 100mi/Midland TX · 8AM CT daily</span>
+  <span>Not affiliated with Ford Motor Company</span>
+</footer>
+
+<script>
+'use strict';
+let snaps=[],vehs=[],dlrs=[],dons=[],dAmt=500,tc=null;
+document.getElementById('yr').textContent=new Date().getFullYear();
+if(new URLSearchParams(location.search).get('donated')==='1'){
+  document.getElementById('dsucc').style.display='block';
+  history.replaceState({},'','/');
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function safeUrl(u){try{const p=new URL(u||'');if(p.protocol==='https:')return u;}catch{}return null;}
+
+async function loadData(){
+  document.getElementById('lb').classList.add('show');
+  try{
+    const r=await fetch('/api/data');
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    snaps=d.snapshots||[];
+    vehs=d.vehicles||[];
+    dlrs=d.dealers||[];
+    dons=d.donations||[];
+
+    if(!snaps.length){
+      document.getElementById('smsg').textContent='No data yet — first scrape runs at 8AM CT.';
+      document.getElementById('vehicleList').innerHTML='<div class="nodata">First data appears after the 8AM CT daily scrape.</div>';
+      document.getElementById('dealerTableWrap').innerHTML='<div class="nodata">Awaiting first scrape...</div>';
+      return;
+    }
+
+    renderStats();renderVehs();renderMap();renderDealerTable();renderChart();renderDons(d.totalDonatedCents||0);
+
+    const l=snaps[snaps.length-1];
+    const ds=new Date(l.snap_date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    document.getElementById('asOf').textContent=ds;
+
+    // Set oil price from Supabase as initial value
+    if(l.wti_price){
+      const p=parseFloat(l.wti_price);
+      document.getElementById('wtiV').textContent='$'+p.toFixed(2);
+      document.getElementById('brtV').textContent='$'+(p+2.5).toFixed(2);
+    }
+
+    if(l.commentary) document.getElementById('fNotes').textContent='"'+l.commentary+'"';
+    document.getElementById('smsg').textContent='Updated '+ds+' · '+snaps.length+' days tracked · auto-updates 8AM CT';
+    document.getElementById('dtrk').textContent=snaps.length+' days of history';
+
+    // Fetch live oil price AFTER Supabase data is rendered
+    // so the live price overwrites the stale daily price correctly
+    fetchLiveOil();
+
+  }catch(e){
+    document.getElementById('smsg').textContent='Error loading data: '+e.message;
+  }finally{
+    document.getElementById('lb').classList.remove('show');
+  }
+}
+
+// Live oil price — throttled to once per 15 min via localStorage
+const OIL_KEY='wti_last_fetch', OIL_TTL=15*60*1000;
+async function fetchLiveOil(){
+  const last=parseInt(localStorage.getItem(OIL_KEY)||'0');
+  if(Date.now()-last<OIL_TTL) return;
+  try{
+    const r=await fetch('/api/oil');
+    if(!r.ok) return;
+    const d=await r.json();
+    if(!d.price||d.price<10) return;
+    document.getElementById('wtiV').textContent='$'+d.price.toFixed(2);
+    document.getElementById('brtV').textContent='$'+(d.price+2.5).toFixed(2);
+    localStorage.setItem(OIL_KEY,String(Date.now()));
+  }catch{}
+}
+
+function renderStats(){
+  if(!snaps.length) return;
+  const l=snaps[snaps.length-1],p=snaps.length>1?snaps[snaps.length-2]:null;
+  document.getElementById('tot').textContent=l.total;
+  if(p){
+    const d=l.total-p.total,el=document.getElementById('totD');
+    el.textContent=d>0?'▲ +'+d+' vs yesterday':d<0?'▼ '+Math.abs(d)+' vs yesterday':'▶ no change';
+    el.className='ss '+(d>0?'dn':d<0?'up':'fl');
+  }else{document.getElementById('totD').textContent='first data point';document.getElementById('totD').className='ss fl';}
+  updateSig(l.total);
+}
+
+function updateSig(n){
+  document.getElementById('sigF').style.width=Math.min(100,Math.max(4,Math.round((n/100)*100)))+'%';
+  let t;
+  if(n<8) t=n+' trucks · BOOM — Basin hot, lots bare';
+  else if(n<20) t=n+' trucks · STRONG — money moving in the patch';
+  else if(n<40) t=n+' trucks · NEUTRAL — normal, watch the trend';
+  else if(n<60) t=n+' trucks · COOLING — spending slows, inventory builds';
+  else if(n<80) t=n+' trucks · SLOW — crews getting cut, rigs stacking';
+  else t=n+' trucks · BUST — repo man on Andrews Hwy is having a great month';
+  document.getElementById('sigT').textContent=t;
+}
+
+function renderVehs(){
+  if(!vehs.length){
+    document.getElementById('vehicleList').innerHTML='<div class="no-vehicles">No Raptors in stock within 100 miles right now. Basin is buying.</div>';
+    return;
+  }
+  const today=new Date();
+  const days=s=>s?Math.floor((today-new Date(s+'T12:00:00'))/(864e5)):0;
+  const hdr='<div class="vr vh"><span>VIN</span><span>TRIM</span><span>DEALER</span><span style="text-align:right">PRICE</span><span style="text-align:right">DAYS</span><span></span></div>';
+  const rows=vehs.map(v=>{
+    const d=days(v.first_seen);
+    const price=v.msrp?'<span class="vmsrp">$'+Math.round(v.msrp/1000)+'k</span>':'<span class="vmsrp no-price">—</span>';
+    const vin=v.vin?esc(v.vin.slice(0,4))+'…'+esc(v.vin.slice(-4)):'—';
+    const url=safeUrl(v.vehicle_url);
+    const lk=url?'<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">VIEW →</a>':'<span style="color:#222">—</span>';
+    const rowOpen=url?'<a class="vr vr-link" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">':'<div class="vr">';
+    const rowClose=url?'</a>':'</div>';
+    return rowOpen+'<span class="vvin">'+vin+'</span>'
+      +'<span class="vtrim">RAPTOR</span>'
+      +'<span class="vdeal">'+esc(v.dealer_name)+'<br><span style="font-size:9px;color:var(--faint)">'+esc(v.dealer_city||'')+'</span></span>'
+      +price
+      +'<span class="vdays">'+(d===0?'Today':d+'d')+'</span>'
+      +'<span class="vlink">'+lk+'</span>'
+      +rowClose;
+  }).join('');
+  document.getElementById('vehicleList').innerHTML=hdr+rows;
+}
+
+function renderMap(){
+  // Dealer known coords fallback (in case Supabase doesn't have lat/lng yet)
+  const fallback={
+    'Rogers Ford Sales':      [31.9716,-102.1235],
+    'Sewell Ford':            [31.8457,-102.3676],
+    'Star Ford Of Big Spring':[32.2504,-101.4788],
+    'Premier Ford Of Lamesa': [32.7379,-101.9566],
+    'Bailey Toliver Ford':    [32.1262,-101.7896],
+    'Permian Ford':           [32.3196,-102.5524],
+    'Smith Auto Family Ford': [33.5879,-102.3779],
+    'Stanley Ford Sweetwater':[32.4710,-100.4054],
+  };
+
+  if(typeof L==='undefined') return; // Leaflet not loaded yet
+
+  const mapEl=document.getElementById('raptorMap');
+  if(!mapEl) return;
+
+  // Destroy existing map if re-rendering
+  if(window._raptorMap) window._raptorMap.remove();
+
+  const map=L.map('raptorMap',{
+    center:[31.9716,-102.0779], // Midland TX
+    zoom:8,
+    zoomControl:true,
+  });
+  window._raptorMap=map;
+
+  // Dark tile layer — CartoDB dark matter, no API key needed
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    attribution:'&copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains:'abcd',
+    maxZoom:19
+  }).addTo(map);
+
+  // Midland center marker
+  L.circleMarker([31.9716,-102.0779],{
+    radius:6,color:'#f0a500',fillColor:'#f0a500',fillOpacity:0.3,weight:2
+  }).addTo(map).bindTooltip('Midland TX — search center',{direction:'top'});
+
+  // 100-mile radius circle (~160km)
+  L.circle([31.9716,-102.0779],{
+    radius:160934,color:'#f0a500',fillColor:'#f0a500',
+    fillOpacity:0.03,weight:1,dashArray:'4 6'
+  }).addTo(map);
+
+  if(!vehs.length) return;
+
+  // Custom gold truck icon
+  const truckIcon=L.divIcon({
+    className:'',
+    html:`<div style="background:#c8860a;border:2px solid #f0a500;width:12px;height:12px;border-radius:50%;box-shadow:0 0 6px rgba(240,165,0,0.6)"></div>`,
+    iconSize:[12,12],iconAnchor:[6,6]
+  });
+
+  // Cluster group
+  const markers=L.markerClusterGroup({
+    maxClusterRadius:40,
+    iconCreateFunction:function(cluster){
+      const n=cluster.getChildCount();
+      return L.divIcon({
+        html:`<div style="background:#c8860a;border:2px solid #f0a500;color:#000;font-family:var(--display);font-size:14px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(240,165,0,0.5)">${n}</div>`,
+        className:'',iconSize:[32,32],iconAnchor:[16,16]
+      });
+    }
+  });
+
+  // Add a marker per vehicle
+  for(const v of vehs){
+    let lat=v.dealer_lat, lng=v.dealer_lng;
+    if(!lat||!lng){
+      const fb=fallback[v.dealer_name];
+      if(fb){lat=fb[0];lng=fb[1];}
+      else continue;
+    }
+    // Tiny jitter so overlapping pins spread slightly
+    const jlat=lat+(Math.random()-0.5)*0.008;
+    const jlng=lng+(Math.random()-0.5)*0.008;
+    const url=safeUrl(v.vehicle_url);
+    const price=v.msrp?'$'+Math.round(v.msrp/1000)+'k':'—';
+    const popup=`<div class="raptor-popup">
+      <strong>F-150 RAPTOR</strong>
+      ${esc(v.dealer_name)}<br>
+      ${esc(v.dealer_city||'')}<br>
+      ${price}
+      ${url?`<br><a href="${esc(url)}" target="_blank" rel="noopener">VIEW LISTING →</a>`:''}
+    </div>`;
+    L.marker([jlat,jlng],{icon:truckIcon}).bindPopup(popup).addTo(markers);
+  }
+
+  map.addLayer(markers);
+}
+
+function renderDealerTable(){
+  // Build dealer summary directly from vehicles — no static dealer list needed
+  // Marketcheck tells us exactly which dealers have stock
+  const dm=new Map();
+  for(const v of vehs){
+    const k=v.dealer_name;
+    if(!dm.has(k)) dm.set(k,{name:k,city:v.dealer_city,state:v.dealer_state,url:v.dealer_url,count:0});
+    dm.get(k).count++;
+  }
+  // Also add dealers from dlrs (from api/data) which may include zero-count dealers
+  for(const d of dlrs){
+    if(!dm.has(d.name)) dm.set(d.name,{name:d.name,city:d.city,state:d.state||'TX',url:d.url,count:(d.raptor||0)+(d.raptorR||0)});
+  }
+  const list=[...dm.values()].sort((a,b)=>b.count-a.count);
+  if(!list.length){document.getElementById('dealerTableWrap').innerHTML='<div class="nodata">No dealer data yet.</div>';return;}
+  const max=Math.max(...list.map(d=>d.count),1);
+  const rows=list.map(d=>{
+    const isZero=d.count===0;
+    const url=safeUrl(d.url);
+    const nm=url?'<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">'+esc(d.name)+'</a>':esc(d.name);
+    return '<tr class="dt-row">'
+      +'<td class="dt-name'+(isZero?' zero':'')+'">'+nm+'</td>'
+      +'<td class="dt-city">'+esc(d.city||'')+', '+esc(d.state||'TX')+'</td>'
+      +'<td class="dt-count'+(isZero?' zero':'')+'">'+(d.count||'—')+'</td>'
+      +'<td><div class="dt-bar-bg"><div class="dt-bar-fill" style="width:'+Math.round((d.count/max)*100)+'%"></div></div></td>'
+      +'</tr>';
+  }).join('');
+  document.getElementById('dealerTableWrap').innerHTML=
+    '<table class="dealer-table"><thead><tr><th>Dealer</th><th>City</th><th>Raptors</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+function renderChart(){
+  if(tc) tc.destroy();
+  const labels=snaps.map(s=>{const d=new Date(s.snap_date+'T12:00:00');return(d.getMonth()+1)+'/'+d.getDate()});
+  tc=new Chart(document.getElementById('tC'),{type:'line',
+    data:{labels,datasets:[{
+      label:'Raptors',data:snaps.map(s=>s.total),
+      borderColor:'#f0a500',borderWidth:2,
+      pointRadius:snaps.length<15?3:1,pointBackgroundColor:'#f0a500',
+      fill:true,backgroundColor:'rgba(200,134,10,.06)',tension:.35
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#111',titleColor:'#f0a500',bodyColor:'#888',borderColor:'#2a2a2a',borderWidth:1}},
+      scales:{
+        x:{grid:{color:'#181818'},ticks:{color:'#555',font:{size:9},maxTicksLimit:12,autoSkip:true}},
+        y:{grid:{color:'#181818'},ticks:{color:'#555',font:{size:9},stepSize:5},beginAtZero:true}
+      }
+    }
+  });
+}
+
+function renderDons(totalCents){
+  document.getElementById('dtAmt').textContent='$'+Math.round(totalCents/100);
+  if(!dons.length) return;
+  const recent=dons.slice(0,4);
+  document.getElementById('dfeed').innerHTML=recent.map(d=>{
+    const dt=new Date(d.donated_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    return '<div class="dfi"><span class="dfa">$'+Math.round(d.amount_cents/100)+'</span>'
+      +'<span style="color:var(--muted)">'+esc(d.display_name||'Anonymous')+'</span>'
+      +(d.message?'<span style="color:var(--faint);font-style:italic;font-size:9px">"'+esc(d.message)+'"</span>':'')
+      +'<span style="color:var(--faint)">'+dt+'</span></div>';
+  }).join('');
+  const btn=document.getElementById('showAllBtn');
+  if(dons.length>4){btn.style.display='inline-block';btn.textContent='SHOW ALL '+dons.length+' DONATIONS →';}
+}
+
+function showAllDonations(){
+  const list=document.getElementById('donModalList');
+  list.innerHTML=dons.map(d=>{
+    const dt=new Date(d.donated_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    return '<div class="don-row">'
+      +'<span class="don-amt">$'+Math.round(d.amount_cents/100)+'</span>'
+      +'<div style="flex:1;min-width:0">'
+      +'<div class="don-name">'+esc(d.display_name||'Anonymous')+'</div>'
+      +(d.message?'<div class="don-msg">"'+esc(d.message)+'"</div>':'')
+      +'</div>'
+      +'<span class="don-date">'+dt+'</span>'
+      +'</div>';
+  }).join('');
+  document.getElementById('donModal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeDonModal(){
+  document.getElementById('donModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function selAmt(c,b){dAmt=c;document.querySelectorAll('.ab').forEach(x=>x.classList.remove('on'));b.classList.add('on');document.getElementById('otherAmt').classList.remove('show');}
+function selOther(b){document.querySelectorAll('.ab').forEach(x=>x.classList.remove('on'));b.classList.add('on');const i=document.getElementById('otherAmt');i.classList.add('show');i.focus();dAmt=0;}
+function setOther(i){const v=parseInt(i.value);dAmt=(v>0&&v<=500)?v*100:0;}
+
+async function doDonate(){
+  if(!dAmt||dAmt<100){alert('Please select or enter a valid amount.');return;}
+  const btn=document.getElementById('payBtn');
+  btn.disabled=true;btn.textContent='OPENING CHECKOUT...';
+  try{
+    const r=await fetch('/api/donate',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({amount_cents:dAmt,display_name:(document.getElementById('dname').value||'').trim().slice(0,60)||'Anonymous',message:(document.getElementById('dmsg').value||'').trim().slice(0,140)})});
+    const d=await r.json();
+    if(d.url) window.location.href=d.url;
+    else throw new Error(d.error||'Unknown error');
+  }catch(e){alert('Payment error: '+e.message);btn.disabled=false;btn.textContent='PAY — APPLE PAY / CARD';}
+}
+
+loadData();
+</script>
+</body>
+</html>
 
 <div class="chart-section">
   <div class="section-label">90-day trend — rising = bad, falling = good</div>
