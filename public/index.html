@@ -946,7 +946,7 @@ function openSoldModal(){
         ? Math.floor((new Date(v.last_seen+'T12:00:00') - new Date(firstListed+'T12:00:00')) / 864e5)
         : (v.days_on_lot || 0);
       const url = safeUrl(v.vehicle_url);
-      return '<tr class="sold-row"'+(url?' onclick="window.open(''+esc(url)+'','_blank')"':'')+'>'+
+      return '<tr class="sold-row"'+(url?' data-url="'+esc(url)+'"':'')+'>'+
         '<td class="sold-vin">'+vin+'</td>'+
         '<td><span class="sold-trim '+(isRR?'r':'b')+'">'+(isRR?'RAPTOR R':'RAPTOR')+'</span></td>'+
         '<td class="sold-dealer">'+esc(v.dealer_name||'')+'<br><span style="font-size:9px;color:var(--faint)">'+esc(v.dealer_city||'')+'</span></td>'+
@@ -961,6 +961,11 @@ function openSoldModal(){
   }
   document.getElementById('soldModal').classList.add('open');
   document.body.style.overflow='hidden';
+  // Click delegation for sold rows
+  document.getElementById('soldBody').onclick=function(e){
+    const row=e.target.closest('[data-url]');
+    if(row) window.open(row.dataset.url,'_blank','noopener');
+  };
 }
 
 function closeSoldModal(){
