@@ -7,10 +7,8 @@ export default async function handler(req, res) {
   }
 
   const today = new Date().toISOString().split('T')[0];
-  console.log(`[cron] ${today} — starting`);
+  console.log(`[cron] ${today} — starting full scrape`);
 
-  // Run inventory scrape and WTI price fetch in parallel
-  // fetchWTI uses EIA (official gov data) first, Yahoo as fallback
   const [invResult, wtiResult] = await Promise.allSettled([
     scrapeRaptors(),
     fetchWTI(),
@@ -18,21 +16,20 @@ export default async function handler(req, res) {
 
   const inv = invResult.status === 'fulfilled'
     ? invResult.value
-    : { total: 0, raptor: 0, raptorR: 0, vehicles: [], dealers: [], hasData: false, wtiPrice: null };
+    : { total: 0, raptor: 0, raptorR: 0, vehicles: [], dealers: [], hasData: false };
 
-  if (invResult.status === 'rejected') console.error('[cron] scrape error:', invResult.reason?.message);
+  if (invResult.status === 'rejected') {
+    console.error('[cron] scrape error:', invResult.reason?.message);
+  }
 
-  // Prefer fetchWTI (EIA official data) over OpenAI search result
-  const wtiFromEIA   = wtiResult.status === 'fulfilled' ? wtiResult.value?.price : null;
-  const wtiFromScraper = inv.wtiPrice || null;
-  const wtiPrice = wtiFromEIA || wtiFromScraper;
-  console.log(`[cron] WTI — EIA: $${wtiFromEIA}, scraper: $${wtiFromScraper}, using: $${wtiPrice}`);
+  // Prefer Alpha Vantage/EIA from fetchWTI over anything else
+  const wti = wtiResult.status === 'fulfilled' ? wtiResult.value : { price: null };
+  const wtiPrice = wti.price || inv.wtiPrice || null;
+  console.log(`[cron] ${inv.total} vehicles, WTI source price: $${wti.price}, final: $${wtiPrice}`);
 
-  const wtiObj = { price: wtiPrice };
-  console.log(`[cron] ${inv.total} vehicles, WTI $${wtiPrice}`);
+  const commentary = inv.commentary || generateCommentary(inv.total, { price: wtiPrice });
 
-  const commentary = inv.commentary || generateCommentary(inv.total, wtiObj);
-
+  // Save snapshot
   const { error: snapErr } = await supabase
     .from('snapshots')
     .upsert({
@@ -47,9 +44,21 @@ export default async function handler(req, res) {
 
   if (snapErr) console.error('[cron] snapshot error:', snapErr.message);
 
+  // WIPE today's vehicles completely, then reinsert fresh
+  // This prevents accumulation across multiple runs on same day
+  const { error: deleteErr } = await supabase
+    .from('vehicles')
+    .delete()
+    .eq('last_seen', today);
+
+  if (deleteErr) console.error('[cron] delete error:', deleteErr.message);
+
+  // Also mark everything active=false, then reactivate only today's finds
+  await supabase.from('vehicles').update({ active: false }).eq('active', true);
+
   if (inv.vehicles.length > 0) {
     const rows = inv.vehicles.map((v, i) => ({
-      vin:          v.vin || `SRCH-${today}-${i}`.padEnd(17, '0').slice(0, 17),
+      vin:          v.vin || `SRCH-${today}-${i}`.slice(0, 17),
       model_year:   v.model_year,
       model:        v.model,
       trim:         v.trim,
@@ -65,18 +74,11 @@ export default async function handler(req, res) {
       active:       true,
     }));
 
-    const { error: vErr } = await supabase
+    const { error: insertErr } = await supabase
       .from('vehicles')
       .upsert(rows, { onConflict: 'vin', ignoreDuplicates: false });
-    if (vErr) console.error('[cron] vehicle error:', vErr.message);
 
-    const vins = rows.map(r => r.vin).filter(v => !v.startsWith('SRCH'));
-    if (vins.length > 0) {
-      await supabase.from('vehicles')
-        .update({ active: false })
-        .eq('active', true)
-        .not('vin', 'in', `(${vins.map(v => `"${v}"`).join(',')})`);
-    }
+    if (insertErr) console.error('[cron] insert error:', insertErr.message);
   }
 
   console.log('[cron] complete');
