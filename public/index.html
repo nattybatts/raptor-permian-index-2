@@ -157,6 +157,10 @@ header{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 2
 #vehicleList{display:flex;flex-direction:column;gap:1px}
 .vr{background:var(--bg1);display:grid;grid-template-columns:90px 82px 80px 1fr 90px 70px 86px;align-items:center;gap:8px;padding:9px 12px;font-size:10px;color:var(--muted);border-left:3px solid transparent;transition:all .12s}
 .vr:hover{border-left-color:var(--gold-dim);background:var(--bg2)}
+.vr-rr{border-left-color:#8b1a1a!important;background:#0f0808}
+.vr-rr:hover{border-left-color:#c0392b!important;background:#1a0a0a}
+.vr-rr .vmsrp{color:#ff9060}
+.vr-rr .vtrim{color:#ff7070;background:#1a0808;border-color:#5a1515;letter-spacing:2px}
 .vr-link{cursor:pointer}
 .vvin{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px}
 .vtrim{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;color:var(--gold);background:#1a1000;border:1px solid #3a2500}
@@ -576,7 +580,8 @@ function renderVehs(){
     const vin=v.vin?esc(v.vin.slice(0,4))+'…'+esc(v.vin.slice(-4)):'—';
     const url=safeUrl(v.vehicle_url);
     const lk=url?'<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">VIEW →</a>':'<span style="color:#222">—</span>';
-    const cls='vr'+(url?' vr-link':'');
+    const isRR=(v.engine_size>=5.0)||(v.trim==='Raptor R');
+    const cls='vr'+(url?' vr-link':'')+(isRR?' vr-rr':'');
     const attrs=(url?' data-url="'+esc(url)+'"':'')+(v.vin?' data-vin="'+esc(v.vin)+'"':'');
     return '<div class="'+cls+'"'+attrs+'>'
       +'<span class="vvin">'+vin+'</span>'
