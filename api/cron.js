@@ -1,6 +1,3 @@
-// /api/cron — runs synchronously, waits for full result before responding
-// Vercel cron jobs get 60s even on free tier (unlike regular functions which get 10s)
-
 import { scrapeRaptors, fetchWTI, generateCommentary } from '../lib/scraper.js';
 import { supabase } from '../lib/supabase.js';
 
@@ -12,7 +9,8 @@ export default async function handler(req, res) {
   const today = new Date().toISOString().split('T')[0];
   console.log(`[cron] ${today} — starting`);
 
-  // Run scrape and WTI fetch in parallel, wait for both
+  // scrapeRaptors now includes WTI price from OpenAI search
+  // fetchWTI is a fallback if scraper didn't get it
   const [invResult, wtiResult] = await Promise.allSettled([
     scrapeRaptors(),
     fetchWTI(),
@@ -20,21 +18,19 @@ export default async function handler(req, res) {
 
   const inv = invResult.status === 'fulfilled'
     ? invResult.value
-    : { total: 0, raptor: 0, raptorR: 0, vehicles: [], dealers: [], hasData: false };
+    : { total: 0, raptor: 0, raptorR: 0, vehicles: [], dealers: [], hasData: false, wtiPrice: null };
 
-  const wti = wtiResult.status === 'fulfilled'
-    ? wtiResult.value
-    : { price: null, prevPrice: null, change: null };
+  if (invResult.status === 'rejected') console.error('[cron] scrape error:', invResult.reason?.message);
 
-  if (invResult.status === 'rejected') {
-    console.error('[cron] scrape error:', invResult.reason?.message);
-  }
+  // Use WTI price from scraper if available, otherwise fall back to fetchWTI
+  const wtiPrice = inv.wtiPrice ||
+    (wtiResult.status === 'fulfilled' ? wtiResult.value?.price : null);
 
-  console.log(`[cron] found ${inv.total} vehicles, WTI $${wti.price}`);
+  const wtiObj = { price: wtiPrice };
+  console.log(`[cron] ${inv.total} vehicles, WTI $${wtiPrice}`);
 
-  const commentary = inv.commentary || generateCommentary(inv.total, wti);
+  const commentary = inv.commentary || generateCommentary(inv.total, wtiObj);
 
-  // Save snapshot
   const { error: snapErr } = await supabase
     .from('snapshots')
     .upsert({
@@ -42,14 +38,13 @@ export default async function handler(req, res) {
       total:      inv.total,
       raptor:     inv.raptor,
       raptor_r:   inv.raptorR,
-      wti_price:  wti.price,
+      wti_price:  wtiPrice,
       commentary,
       scraped_at: new Date().toISOString(),
     }, { onConflict: 'snap_date' });
 
   if (snapErr) console.error('[cron] snapshot error:', snapErr.message);
 
-  // Save vehicles
   if (inv.vehicles.length > 0) {
     const rows = inv.vehicles.map((v, i) => ({
       vin:          v.vin || `SRCH-${today}-${i}`.padEnd(17, '0').slice(0, 17),
@@ -73,7 +68,6 @@ export default async function handler(req, res) {
       .upsert(rows, { onConflict: 'vin', ignoreDuplicates: false });
     if (vErr) console.error('[cron] vehicle error:', vErr.message);
 
-    // Mark old VINs inactive
     const vins = rows.map(r => r.vin).filter(v => !v.startsWith('SRCH'));
     if (vins.length > 0) {
       await supabase.from('vehicles')
@@ -91,7 +85,7 @@ export default async function handler(req, res) {
     total:    inv.total,
     raptor:   inv.raptor,
     raptorR:  inv.raptorR,
-    wti:      wti.price,
+    wti:      wtiPrice,
     vehicles: inv.vehicles.length,
   });
 }
