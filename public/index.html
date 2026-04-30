@@ -79,6 +79,24 @@ header{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 2
 .don-raised-inline{display:flex;flex-direction:column;align-items:flex-end;margin-left:6px;flex-shrink:0}
 .dt-raised{font-family:var(--display);font-size:22px;color:var(--gold-dim);line-height:1}
 .dt-raised-lbl{font-size:7px;color:var(--faint);letter-spacing:2px;text-transform:uppercase}
+/* Bell icon */
+.vbell-hdr{width:24px}
+.vbell{font-size:12px;cursor:pointer;opacity:0.4;transition:opacity .15s;text-align:center;display:flex;align-items:center;justify-content:center}
+.vbell:hover{opacity:1}
+/* Alert strip */
+.alert-strip{background:#0c0900;border-bottom:1px solid #2a1f00;padding:8px 20px}
+.alert-strip-inner{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.alert-strip-label{font-size:9px;color:var(--gold-dim);letter-spacing:2px;white-space:nowrap}
+.alert-select{background:var(--bg2);border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:10px;padding:6px 8px;outline:none;flex:1;min-width:160px}
+.alert-input-sm{background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:10px;padding:6px 10px;outline:none;flex:1;min-width:140px}
+.alert-input-sm:focus{border-color:var(--gold-dim)}
+.alert-input-sm::placeholder{color:var(--faint)}
+.alert-strip-btn{background:var(--gold-dim);border:none;color:#000;font-family:var(--mono);font-size:9px;font-weight:700;padding:7px 12px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;transition:background .15s}
+.alert-strip-btn:hover{background:var(--gold)}
+.alert-strip-msg{font-size:10px;margin-top:4px}
+.alert-strip-msg.ok{color:var(--green)}
+.alert-strip-msg.err{color:var(--red)}
+@media(max-width:680px){.alert-strip-inner{flex-direction:column;align-items:stretch}.alert-select,.alert-input-sm,.alert-strip-btn{width:100%}}
 .sold-btn{background:transparent;border:1px solid #3a1515;color:#c05050;font-family:var(--mono);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .15s}
 .sold-btn:hover{border-color:#e05555;color:#e05555}
 .sold-table{width:100%;border-collapse:collapse}
@@ -171,7 +189,7 @@ header{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 2
 .cll{width:16px;height:2px;border-radius:1px}
 .vehicles-section{background:var(--bg0);padding:14px 20px;border-bottom:1px solid var(--border)}
 #vehicleList{display:flex;flex-direction:column;gap:1px}
-.vr{background:var(--bg1);display:grid;grid-template-columns:90px 82px 80px 1fr 90px 70px 86px;align-items:center;gap:8px;padding:9px 12px;font-size:10px;color:var(--muted);border-left:3px solid transparent;transition:all .12s}
+.vr{background:var(--bg1);display:grid;grid-template-columns:90px 82px 80px 1fr 90px 70px 86px 24px;align-items:center;gap:8px;padding:9px 12px;font-size:10px;color:var(--muted);border-left:3px solid transparent;transition:all .12s}
 .vr:hover{border-left-color:var(--gold-dim);background:var(--bg2)}
 .vr-rr{border-left-color:#8b1a1a!important;background:#0f0808}
 .vr-rr:hover{border-left-color:#c0392b!important;background:#1a0a0a}
@@ -276,11 +294,12 @@ footer a:hover{color:var(--muted)}
   .days-metrics{order:7}
   .donate-strip{order:8}
   .vehicles-section{order:9}
-  .map-section{order:10}
-  .dealer-section{order:11}
-  .bottom-row{order:12}
-  .status-bar{order:13}
-  footer{order:14}
+  .alert-strip{order:10}
+  .map-section{order:11}
+  .dealer-section{order:12}
+  .bottom-row{order:13}
+  .status-bar{order:14}
+  footer{order:15}
   .don-modal{order:99}
   /* Friend bar — hide button, keep text */
   .friend-bar .friend-btn{display:none}
@@ -374,6 +393,37 @@ footer a:hover{color:var(--muted)}
   <button class="show-all-btn" id="showAllBtn" onclick="showAllDonations()" style="display:none">SHOW ALL DONATIONS →</button>
 </div>
 
+<!-- Alert Modal (VIN-specific) -->
+<div class="don-modal" id="alertModal" onclick="if(event.target===this)closeAlertModal()">
+  <div class="don-modal-inner" style="max-width:440px">
+    <div class="don-modal-header">
+      <span class="don-modal-title">SET ALERT</span>
+      <button class="don-modal-close" onclick="closeAlertModal()">✕</button>
+    </div>
+    <div style="padding:16px 20px">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:12px">
+        Watching: <span id="alertVinDisplay" style="color:var(--gold);font-family:var(--mono)"></span><br>
+        <span id="alertDealerDisplay" style="color:var(--faint);font-size:9px"></span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <select class="alert-input" id="modalAlertType" onchange="toggleDaysInput('modal')">
+          <option value="sold">Alert when this truck sells</option>
+          <option value="days">Alert when it hits X days on lot</option>
+          <option value="price">Alert when price drops</option>
+        </select>
+        <div id="modalDaysRow" style="display:none;align-items:center;gap:8px">
+          <label style="font-size:10px;color:var(--muted)">Notify after</label>
+          <input class="alert-input" id="modalDaysVal" type="number" value="30" min="1" max="180" style="width:70px">
+          <label style="font-size:10px;color:var(--muted)">days on lot (max 180)</label>
+        </div>
+        <input class="alert-input" id="modalEmail" type="email" placeholder="your@email.com" autocomplete="email">
+        <button class="alert-btn" onclick="submitModalAlert()">SET ALERT →</button>
+        <div class="alert-msg" id="modalAlertMsg"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Recently Sold Modal -->
 <div class="veh-modal" id="soldModal" onclick="if(event.target===this)closeSoldModal()">
   <div class="veh-modal-inner">
@@ -459,6 +509,21 @@ footer a:hover{color:var(--muted)}
   <div id="vehicleList"><div class="nodata">Loading vehicles...</div></div>
 </div>
 
+<div class="alert-strip">
+  <div class="alert-strip-inner">
+    <span class="alert-strip-label">🔔 GET ALERTS</span>
+    <select class="alert-select" id="globalAlertType" onchange="toggleDaysInput('global')">
+      <option value="sold">Any Raptor sells</option>
+      <option value="days">Sitting X+ days</option>
+      <option value="price">Price drop</option>
+    </select>
+    <input class="alert-input-sm" id="globalDaysVal" type="number" value="30" min="1" max="180" placeholder="Days (max 180)" style="display:none;width:90px">
+    <input class="alert-input-sm" id="globalEmail" type="email" placeholder="your@email.com">
+    <button class="alert-strip-btn" onclick="submitGlobalAlert()">NOTIFY ME →</button>
+  </div>
+  <div class="alert-strip-msg" id="globalAlertMsg"></div>
+</div>
+
 <div class="map-section">
   <div class="section-label">Raptor locations — 100-mile radius · Midland TX</div>
   <div id="raptorMap"></div>
@@ -492,39 +557,6 @@ footer a:hover{color:var(--muted)}
   </div>
 </div>
 
-<div class="alerts-section">
-  <div class="section-label">🔔 Get Notified — Free Email Alerts</div>
-  <div class="alerts-grid">
-    <label class="alert-card" onclick="selectAlert(this,'sold')">
-      <input type="radio" name="atype" value="sold" style="display:none">
-      <div class="ac-icon">🔴</div>
-      <div class="ac-title">RAPTOR SOLD</div>
-      <div class="ac-desc">Alert when any Raptor disappears from inventory</div>
-    </label>
-    <label class="alert-card" onclick="selectAlert(this,'days')">
-      <input type="radio" name="atype" value="days" style="display:none">
-      <div class="ac-icon">⏱</div>
-      <div class="ac-title">SITTING TOO LONG</div>
-      <div class="ac-desc">Alert when a truck hits your target days on lot</div>
-      <div class="ac-extra" id="daysExtra" style="display:none">
-        <input class="alert-input" id="daysThresh" type="number" value="30" min="7" max="365" placeholder="Days" onclick="event.stopPropagation()" style="width:70px">
-        <span style="font-size:10px;color:var(--muted)">days</span>
-      </div>
-    </label>
-    <label class="alert-card" onclick="selectAlert(this,'price')">
-      <input type="radio" name="atype" value="price" style="display:none">
-      <div class="ac-icon">💰</div>
-      <div class="ac-title">PRICE DROP</div>
-      <div class="ac-desc">Alert when any Raptor drops in price</div>
-    </label>
-  </div>
-  <div class="alerts-form">
-    <input class="alert-input" id="alertEmail" type="email" placeholder="your@email.com" autocomplete="email">
-    <input class="alert-input" id="alertVin" type="text" placeholder="VIN (optional — leave blank for any Raptor)" maxlength="17" style="flex:2">
-    <button class="alert-btn" onclick="submitAlert()">SET ALERT →</button>
-  </div>
-  <div class="alert-msg" id="alertMsg"></div>
-</div>
 
 <div class="status-bar">
   <span class="smsg" id="smsg">Loading inventory data...</span>
@@ -559,10 +591,69 @@ footer a:hover{color:var(--muted)}
 let snaps=[],vehs=[],dlrs=[],dons=[],dAmt=500,tc=null;
 document.getElementById('yr').textContent=new Date().getFullYear();
 
-function selectAlert(card, type){
-  document.querySelectorAll('.alert-card').forEach(c=>c.classList.remove('selected'));
-  card.classList.add('selected');
-  document.getElementById('daysExtra').style.display = type==='days' ? 'block' : 'none';
+function toggleDaysInput(scope){
+  if(scope==='modal'){
+    const type = document.getElementById('modalAlertType').value;
+    document.getElementById('modalDaysRow').style.display = type==='days' ? 'flex' : 'none';
+  } else {
+    const type = document.getElementById('globalAlertType').value;
+    document.getElementById('globalDaysVal').style.display = type==='days' ? 'inline-block' : 'none';
+  }
+}
+
+function openAlertModal(vin, dealer){
+  document.getElementById('alertVinDisplay').textContent = vin || 'Any Raptor';
+  document.getElementById('alertDealerDisplay').textContent = dealer || '';
+  document.getElementById('modalEmail').value = '';
+  document.getElementById('modalAlertMsg').textContent = '';
+  document.getElementById('alertModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Store VIN for submission
+  document.getElementById('alertModal').dataset.vin = vin || '';
+}
+
+function closeAlertModal(){
+  document.getElementById('alertModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function submitModalAlert(){
+  const email = document.getElementById('modalEmail').value.trim();
+  const alert_type = document.getElementById('modalAlertType').value;
+  const vin = document.getElementById('alertModal').dataset.vin || null;
+  const msg = document.getElementById('modalAlertMsg');
+  if(!email){msg.className='alert-msg err';msg.textContent='Email required.';return;}
+  const btn = document.querySelector('#alertModal .alert-btn');
+  btn.disabled=true; btn.textContent='SAVING...';
+  try{
+    const threshold = alert_type==='days' ? Math.min(180, parseInt(document.getElementById('modalDaysVal').value)||30) : 30;
+    const r = await fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email,alert_type,vin:vin||null,threshold})});
+    const d = await r.json();
+    if(d.ok){msg.className='alert-msg ok';msg.textContent='✓ Alert set! Check your email.';
+      setTimeout(closeAlertModal, 2000);}
+    else{msg.className='alert-msg err';msg.textContent=d.error||'Error.';}
+  }catch(e){msg.className='alert-msg err';msg.textContent=e.message;}
+  btn.disabled=false; btn.textContent='SET ALERT →';
+}
+
+async function submitGlobalAlert(){
+  const email = document.getElementById('globalEmail').value.trim();
+  const alert_type = document.getElementById('globalAlertType').value;
+  const msg = document.getElementById('globalAlertMsg');
+  if(!email){msg.className='alert-strip-msg err';msg.textContent='Email required.';return;}
+  const btn = document.querySelector('.alert-strip-btn');
+  btn.disabled=true; btn.textContent='SAVING...';
+  try{
+    const threshold = alert_type==='days' ? Math.min(180, parseInt(document.getElementById('globalDaysVal').value)||30) : 30;
+    const r = await fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email,alert_type,vin:null,threshold})});
+    const d = await r.json();
+    if(d.ok){msg.className='alert-strip-msg ok';msg.textContent='✓ Alert set! Check your email.';
+      document.getElementById('globalEmail').value='';}
+    else{msg.className='alert-strip-msg err';msg.textContent=d.error||'Error.';}
+  }catch(e){msg.className='alert-strip-msg err';msg.textContent=e.message;}
+  btn.disabled=false; btn.textContent='NOTIFY ME →';
 }
 
 async function submitAlert(){
@@ -729,12 +820,17 @@ function renderVehs(){
       +price
       +'<span class="vdays">'+(v.days_on_lot>0?v.days_on_lot+'d':'—')+'</span>'
       +'<span class="vlink">'+lk+'</span>'
+            +'<span class="vbell" data-vin="'+esc(v.vin||'')+'" data-dealer="'+esc(v.dealer_name||'')+'">🔔</span>'
       +'</div>';
   }).join('');
   document.getElementById('vehicleList').innerHTML=hdr+rows;
   // Click handler — open detail popup, VIEW button still navigates directly
   document.getElementById('vehicleList').onclick=function(e){
-    if(e.target.closest('a')) return; // let VIEW link work normally
+    if(e.target.closest('a')) return;
+    // Bell icon — open alert modal
+    const bell=e.target.closest('.vbell');
+    if(bell){openAlertModal(bell.dataset.vin||'',bell.dataset.dealer||'');return;}
+    // Row click — open vehicle detail
     const row=e.target.closest('[data-url]');
     if(row){
       const vin=row.dataset.vin;
