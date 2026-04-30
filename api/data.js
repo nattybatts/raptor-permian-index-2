@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
       // Active vehicles for current display
       supabase.from('vehicles')
-        .select('vin, model_year, model, trim, color, msrp, dealer_name, dealer_city, dealer_state, vehicle_url, dealer_url, dealer_lat, dealer_lng, days_on_lot, days_on_lot_180, first_listed, first_seen, last_seen')
+        .select('vin, model_year, model, trim, color, interior_color, msrp, dealer_name, dealer_city, dealer_state, vehicle_url, dealer_url, dealer_lat, dealer_lng, days_on_lot, days_on_lot_180, first_listed, first_seen, last_seen, in_transit, vehicle_status, engine_size')
         .eq('active', true)
         .order('days_on_lot', { ascending: false }),
 

@@ -155,11 +155,17 @@ header{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 2
 .cll{width:16px;height:2px;border-radius:1px}
 .vehicles-section{background:var(--bg0);padding:14px 20px;border-bottom:1px solid var(--border)}
 #vehicleList{display:flex;flex-direction:column;gap:1px}
-.vr{background:var(--bg1);display:grid;grid-template-columns:90px 82px 1fr 90px 70px 86px;align-items:center;gap:8px;padding:9px 12px;font-size:10px;color:var(--muted);border-left:3px solid transparent;transition:all .12s}
+.vr{background:var(--bg1);display:grid;grid-template-columns:90px 82px 80px 1fr 90px 70px 86px;align-items:center;gap:8px;padding:9px 12px;font-size:10px;color:var(--muted);border-left:3px solid transparent;transition:all .12s}
 .vr:hover{border-left-color:var(--gold-dim);background:var(--bg2)}
 .vr-link{cursor:pointer}
 .vvin{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px}
 .vtrim{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;color:var(--gold);background:#1a1000;border:1px solid #3a2500}
+.vtrim.rr{color:#ff7070;background:#1a0808;border:1px solid #3a1515}
+.vstat-cell{display:flex;align-items:center}
+.vstat-hdr{font-size:8px}
+.vstat{font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 5px;border-radius:2px;white-space:nowrap}
+.vstat.transit{color:var(--gold);background:#1a1000;border:1px solid #3a2500}
+.vstat.lot{color:var(--green);background:#0a1a0a;border:1px solid #2a4a2a}
 .vdeal{color:#999;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vmsrp{text-align:right;font-family:var(--display);font-size:19px;color:var(--gold)}
 .vmsrp.no-price{color:var(--faint);font-size:14px}
@@ -212,7 +218,7 @@ footer a:hover{color:var(--muted)}
   header,.price-strip,.vehicles-section,.dealer-section,.pane,.donate-strip,.stats-signal,.signal-card,.chart-section,.map-section{padding:10px 14px}
   /* Vehicle rows: just TRIM | DEALER | PRICE on mobile */
   .vr{grid-template-columns:70px 1fr auto auto;gap:6px;padding:10px 14px}
-  .vlink,.vvin,.vh span:nth-child(1),.vh span:nth-child(5),.vh span:nth-child(6){display:none}
+  .vlink,.vvin,.vstat-cell,.vstat-hdr,.vh span:nth-child(1),.vh span:nth-child(5),.vh span:nth-child(6){display:none}
   .vh{grid-template-columns:70px 1fr auto auto}
   .vdays{font-size:9px;color:var(--muted)}
   .vmsrp{font-size:16px}
@@ -557,7 +563,7 @@ function renderVehs(){
   }
   const hdr='<div class="vr vh">'
     +'<span>VIN</span>'
-    +'<span>TRIM</span>'
+    +'<span>TRIM</span>'+'<span class="vstat-hdr">STATUS</span>'
     +'<span>DEALER</span>'
     +'<span style="text-align:right;cursor:pointer" onclick="sortVehs(\'price\')" id="hdrPrice">PRICE '+(sortKey==='price'?(sortDir>0?'▲':'▼'):'↕')+'</span>'
     +'<span style="text-align:right;cursor:pointer" onclick="sortVehs(\'days\')" id="hdrDays">DAYS ON LOT '+(sortKey==='days'?(sortDir>0?'▲':'▼'):'↕')+'</span>'
@@ -574,7 +580,8 @@ function renderVehs(){
     const attrs=(url?' data-url="'+esc(url)+'"':'')+(v.vin?' data-vin="'+esc(v.vin)+'"':'');
     return '<div class="'+cls+'"'+attrs+'>'
       +'<span class="vvin">'+vin+'</span>'
-      +'<span class="vtrim">RAPTOR</span>'
+      +'<span class="vtrim '+(v.in_transit===false&&v.days_on_lot>0?'':'')+'">'+((v.engine_size||0)>=5.0?'RAPTOR R':'RAPTOR')+'</span>'
+      +'<span class="vstat-cell"><span class="vstat '+(v.in_transit?'transit':'lot')+'">'+(v.in_transit?'TRANSIT':'ON LOT')+'</span></span>'
       +'<span class="vdeal">'+esc(v.dealer_name)+'<br><span style="font-size:9px;color:var(--faint)">'+esc(v.dealer_city||'')+'</span></span>'
       +price
       +(function(){
