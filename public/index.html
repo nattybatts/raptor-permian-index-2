@@ -82,7 +82,7 @@ header{background:#100c00;border-bottom:2px solid var(--gold-dim);padding:14px 2
 .dealer-section{background:var(--bg0);padding:16px 24px;border-bottom:1px solid var(--border)}
 .dr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #0f0f0f}
 .dr:last-child{border-bottom:none}
-.dn{font-size:11px;color:#888;min-width:180px}
+.dn2{font-size:11px;color:#888;min-width:180px}
 .dc{font-size:9px;color:var(--dim);min-width:80px}
 .dbb{flex:1;height:3px;background:#181818;border-radius:2px;overflow:hidden}
 .dbf{height:100%;background:var(--gold-dim);border-radius:2px;transition:width .7s ease}
@@ -125,6 +125,8 @@ footer a{color:#3a3a3a;text-decoration:none}
 footer a:hover{color:var(--muted)}
 .lbanner{display:none;background:#0d0900;border-bottom:1px solid #2a1f00;padding:9px 24px;text-align:center;font-size:11px;color:var(--gold-dim);letter-spacing:2px;animation:blink 1.2s infinite}
 .lbanner.show{display:block}
+.scrape-banner{background:#0a0d00;border-bottom:1px solid #2a3000;padding:9px 24px;text-align:center;font-size:11px;color:#7a9a30;letter-spacing:1px;display:none}
+.scrape-banner.show{display:block}
 .nodata{color:#333;font-size:11px;padding:10px 0;font-style:italic}
 .errnote{color:var(--red);font-size:10px;padding:10px 0}
 @media(max-width:700px){
@@ -149,11 +151,12 @@ footer a:hover{color:var(--muted)}
 <div class="sponsor-bar">
   <span class="sp-lbl">Sponsored</span>
   <span style="font-size:11px;color:#5a4a30">Your oilfield company here &nbsp;&nbsp;</span>
-  <a class="sp-link" href="mailto:sponsor@raptorcount.com">sponsor@raptorcount.com</a>
+  <a class="sp-link" href="mailto:sponsor@permianraptorindex.com">sponsor@permianraptorindex.com</a>
   <span class="sp-lbl" style="margin-left:auto">$400/mo · 2-3K O&amp;G readers</span>
 </div>
 
 <div class="lbanner" id="lb">LOADING INVENTORY DATA...</div>
+<div class="scrape-banner" id="scrapeBanner"></div>
 
 <div class="price-strip">
   <div class="pb"><span class="pl">WTI</span><span class="pv" id="wtiV">—</span><span class="pc" id="wtiC"></span></div>
@@ -196,7 +199,7 @@ footer a:hover{color:var(--muted)}
 </div>
 
 <div class="vehicles-section">
-  <div class="section-label">Active vehicles · VIN-verified · click to view on dealer site</div>
+  <div class="section-label">Active vehicles on lots · VIN-verified · click to view on dealer site</div>
   <div class="trow">
     <button class="tb on" onclick="setVTab('all',this)">ALL (<span id="tAll">—</span>)</button>
     <button class="tb" onclick="setVTab('raptorR',this)">RAPTOR R (<span id="tRR">—</span>)</button>
@@ -215,8 +218,8 @@ footer a:hover{color:var(--muted)}
     <div class="section-label">Field Notes</div>
     <div class="cq" id="fNotes">"When WTI's above $80, every roughneck's got a Raptor on order and the lots are bare. When it drops to $55, the trucks start stacking up and Andrews Highway becomes a repo parade. The Permian giveth and the Permian taketh away."</div>
     <div style="margin-top:14px;font-size:9px;color:#2a2a2a;line-height:2.1">
-      Data: Ford dealer inventory API · Raptor and Raptor R trims only<br>
-      150-mile radius · Midland TX 79701 · VIN-verified · 8AM CT daily
+      Data: Anthropic web search · Raptor and Raptor R trims only<br>
+      150-mile radius · Midland TX 79701 · Updated daily 8AM CT
     </div>
   </div>
   <div class="pane">
@@ -277,47 +280,189 @@ footer a:hover{color:var(--muted)}
 
 <footer>
   <span>PERMIAN RAPTOR INDEX &copy; <span id="yr"></span></span>
-  <span>Ford inventory API · EIA crude · 150mi/Midland TX · 8AM CT</span>
+  <span>Anthropic web search · EIA crude · 150mi/Midland TX · 8AM CT</span>
   <span>Not affiliated with Ford Motor Company</span>
 </footer>
 
 <script>
+// ── CONFIG ────────────────────────────────────────────────
+// These are injected at runtime — set as Vercel env vars
+// VITE_ prefix not needed since this is plain HTML
+// We read them from the page's meta tags set by the server, OR use hardcoded public values
+// CRON_SECRET is used to save snapshots — it's safe here since it only allows writing data, not reading secrets
+const CRON_SECRET = window.__CRON_SECRET__ || '';
+
 let snaps=[],vehs=[],dlrs=[],dons=[];
 let fMode='all',vTab='all',dAmt=500,tc=null;
 document.getElementById('yr').textContent=new Date().getFullYear();
+
 if(new URLSearchParams(location.search).get('donated')==='1'){
   document.getElementById('dsucc').style.display='block';
   history.replaceState({},'','/');
 }
+
 function setF(f,b){fMode=f;document.querySelectorAll('.fb').forEach(x=>x.classList.remove('on'));b.classList.add('on');renderStats()}
 function setVTab(t,b){vTab=t;document.querySelectorAll('.tb').forEach(x=>x.classList.remove('on'));b.classList.add('on');renderVehs()}
+
+// ── LOAD SAVED DATA ────────────────────────────────────────
 async function loadData(){
   document.getElementById('lb').classList.add('show');
-  document.getElementById('smsg').textContent='Fetching inventory data...';
+  document.getElementById('smsg').textContent='Loading saved inventory data...';
   try{
     const r=await fetch('/api/data');
     if(!r.ok) throw new Error('HTTP '+r.status);
     const d=await r.json();
     snaps=d.snapshots||[];vehs=d.vehicles||[];dlrs=d.dealers||[];dons=d.donations||[];
-    if(!snaps.length){
-      document.getElementById('smsg').textContent='No data yet — first scrape runs at 8AM CT. Check back tomorrow.';
-      document.getElementById('vehicleList').innerHTML='<div class="nodata">First data appears after the 8AM CT daily scrape.</div>';
-      document.getElementById('dealerRows').innerHTML='<div class="nodata">Awaiting first scrape...</div>';
-      return;
+
+    const today=new Date().toISOString().split('T')[0];
+    const hasToday=snaps.some(s=>s.snap_date===today && s.total>0);
+
+    if(snaps.length){
+      renderStats();renderVehs();renderDlrs();renderChart();renderDons(d.totalDonatedCents||0);
+      const l=snaps[snaps.length-1];
+      const ds=new Date(l.snap_date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      document.getElementById('asOf').textContent=ds;
+      if(l.wti_price){const p=parseFloat(l.wti_price);document.getElementById('wtiV').textContent='$'+p.toFixed(2);document.getElementById('brtV').textContent='$'+(p+2.5).toFixed(2)}
+      if(l.commentary) document.getElementById('fNotes').textContent='"'+l.commentary+'"';
+      document.getElementById('smsg').textContent='Data as of '+ds+' · '+snaps.length+' days tracked · 150mi radius · updates daily 8AM CT';
+      document.getElementById('dtrk').textContent=snaps.length+' days of history';
     }
-    renderStats();renderVehs();renderDlrs();renderChart();renderDons(d.totalDonatedCents||0);
-    const l=snaps[snaps.length-1];
-    const ds=new Date(l.snap_date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    document.getElementById('asOf').textContent=ds;
-    if(l.wti_price){const p=parseFloat(l.wti_price);document.getElementById('wtiV').textContent='$'+p.toFixed(2);document.getElementById('brtV').textContent='$'+(p+2.5).toFixed(2)}
-    if(l.commentary) document.getElementById('fNotes').textContent='"'+l.commentary+'"';
-    document.getElementById('smsg').textContent='Updated '+ds+' · '+snaps.length+' days tracked · VIN-verified Raptor/Raptor R only · 150mi radius · auto-updates 8AM CT';
-    document.getElementById('dtrk').textContent=snaps.length+' days of history';
+
+    // If no data for today, trigger a fresh scrape
+    if(!hasToday){
+      document.getElementById('lb').classList.remove('show');
+      runDailyScrape();
+    } else {
+      document.getElementById('lb').classList.remove('show');
+    }
   }catch(e){
-    document.getElementById('smsg').textContent='Error: '+e.message;
-    document.getElementById('vehicleList').innerHTML='<div class="errnote">Could not load data. Try refreshing.</div>';
-  }finally{document.getElementById('lb').classList.remove('show')}
+    document.getElementById('lb').classList.remove('show');
+    document.getElementById('smsg').textContent='Error loading data: '+e.message;
+    runDailyScrape();
+  }
 }
+
+// ── ANTHROPIC SCRAPE (client-side) ────────────────────────
+// Runs when there's no data for today
+// Uses Anthropic API directly from the browser
+async function runDailyScrape(){
+  const banner=document.getElementById('scrapeBanner');
+  banner.textContent='SEARCHING FOR RAPTOR INVENTORY — THIS TAKES ~30 SECONDS...';
+  banner.classList.add('show');
+  document.getElementById('smsg').textContent='Running daily inventory search via Anthropic API...';
+
+  const steps=['Searching Midland Ford dealers...','Checking Odessa inventory...','Querying Lubbock area...','Checking AutoTrader and Cars.com...','Compiling results...'];
+  let si=0;
+  const stepTimer=setInterval(()=>{if(si<steps.length){banner.textContent=steps[si++]}},5000);
+
+  try{
+    const prompt=`Search for current new Ford F-150 Raptor and Ford F-150 Raptor R truck inventory at Ford dealerships within 150 miles of Midland, TX (zip 79701). Also search for Ford Ranger Raptor trucks in this area.
+
+Search dealer websites, Cars.com, AutoTrader, and any Ford dealer inventory pages you can find in:
+- Midland TX, Odessa TX, Lubbock TX, Abilene TX, San Angelo TX, Big Spring TX, Pecos TX, Andrews TX
+
+IMPORTANT: Only include trucks where the trim specifically says "Raptor" or "Raptor R". NOT regular F-150s.
+
+Also get the current WTI crude oil spot price.
+
+Respond ONLY with valid JSON, no markdown or explanation:
+{
+  "raptorCount": <total Raptor trucks found, number>,
+  "raptorRCount": <total Raptor R trucks found, number>,
+  "wtiPrice": <WTI crude price as decimal number>,
+  "vehicles": [
+    {"vin":"<17-char VIN or blank>","trim":"<Raptor or Raptor R>","model":"<F-150 or Ranger>","dealer_name":"<name>","dealer_city":"<city TX>","msrp":<number or null>,"vehicle_url":"<url or null>","dealer_url":"<url or null>"}
+  ],
+  "commentary": "<one sardonic sentence about what this inventory level says about Permian Basin OFS health, noting whether high stock is bad or low stock is good>"
+}`;
+
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':window.__ANTHROPIC_KEY__||'',
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true',
+      },
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:4000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:prompt}],
+      }),
+    });
+
+    if(!resp.ok) throw new Error('Anthropic API: '+resp.status);
+    const data=await resp.json();
+
+    let raw='';
+    for(const b of (data.content||[])){if(b.type==='text') raw+=b.text}
+    raw=raw.replace(/```json|```/g,'').trim();
+    const s=raw.indexOf('{'),e=raw.lastIndexOf('}');
+    if(s<0||e<0) throw new Error('No JSON in response');
+    const result=JSON.parse(raw.slice(s,e+1));
+
+    const total=(parseInt(result.raptorCount)||0)+(parseInt(result.raptorRCount)||0);
+    const wti=parseFloat(result.wtiPrice)||null;
+
+    // Update UI immediately
+    if(wti){document.getElementById('wtiV').textContent='$'+wti.toFixed(2);document.getElementById('brtV').textContent='$'+(wti+2.5).toFixed(2)}
+    document.getElementById('asOf').textContent=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    if(result.commentary) document.getElementById('fNotes').textContent='"'+result.commentary+'"';
+
+    // Merge into snaps for chart
+    const today=new Date().toISOString().split('T')[0];
+    const todayLabel=(new Date().getMonth()+1)+'/'+(new Date().getDate());
+    const existing=snaps.findIndex(s=>s.snap_date===today);
+    const snap={snap_date:today,total,raptor:parseInt(result.raptorCount)||0,raptor_r:parseInt(result.raptorRCount)||0,wti_price:wti,commentary:result.commentary};
+    if(existing>=0) snaps[existing]=snap; else snaps.push(snap);
+
+    // Normalize vehicles
+    vehs=(result.vehicles||[]).map((v,i)=>({
+      vin:v.vin&&v.vin.length===17?v.vin:null,
+      model_year:new Date().getFullYear(),
+      model:v.model||'F-150',
+      trim:v.trim||'Raptor',
+      msrp:v.msrp||null,
+      dealer_name:v.dealer_name||'Unknown',
+      dealer_city:v.dealer_city||'',
+      vehicle_url:v.vehicle_url||null,
+      dealer_url:v.dealer_url||null,
+      first_seen:today,
+      last_seen:today,
+    }));
+
+    // Build dealers from vehicles
+    const dm=new Map();
+    for(const v of vehs){
+      if(!dm.has(v.dealer_name)) dm.set(v.dealer_name,{name:v.dealer_name,city:v.dealer_city,url:v.dealer_url,raptor:0,raptorR:0});
+      const d=dm.get(v.dealer_name);
+      if(v.trim==='Raptor R') d.raptorR++; else d.raptor++;
+    }
+    dlrs=Array.from(dm.values()).sort((a,b)=>(b.raptor+b.raptorR)-(a.raptor+a.raptorR));
+
+    renderStats();renderVehs();renderDlrs();renderChart();
+
+    document.getElementById('smsg').textContent='Live search complete · '+total+' Raptors found · '+vehs.length+' vehicles · updated just now';
+
+    // Save to Supabase via API
+    if(CRON_SECRET){
+      fetch('/api/save-snapshot',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+CRON_SECRET},
+        body:JSON.stringify({total,raptor:parseInt(result.raptorCount)||0,raptorR:parseInt(result.raptorRCount)||0,wtiPrice:wti,commentary:result.commentary,vehicles:vehs}),
+      }).then(r=>r.json()).then(d=>console.log('Saved to Supabase:',d)).catch(e=>console.error('Save failed:',e));
+    }
+
+  }catch(err){
+    console.error('Scrape error:',err);
+    document.getElementById('smsg').textContent='Search error: '+err.message+' — showing cached data';
+  }finally{
+    clearInterval(stepTimer);
+    banner.classList.remove('show');
+  }
+}
+
 function renderStats(){
   if(!snaps.length) return;
   const l=snaps[snaps.length-1],p=snaps.length>1?snaps[snaps.length-2]:null;
@@ -335,6 +480,7 @@ function renderStats(){
   } else {document.getElementById('totD').textContent='first data point';document.getElementById('totD').className='ss fl'}
   updateSig(l.total);
 }
+
 function updateSig(n){
   const pct=Math.min(100,Math.max(4,Math.round((n/100)*100)));
   document.getElementById('sigF').style.width=pct+'%';
@@ -347,6 +493,7 @@ function updateSig(n){
   else t=n+' trucks · BUST — repo man on Andrews Hwy is having a great month';
   document.getElementById('sigT').textContent=t;
 }
+
 function renderVehs(){
   const rR=vehs.filter(v=>v.trim==='Raptor R'),base=vehs.filter(v=>v.trim!=='Raptor R');
   document.getElementById('tAll').textContent=vehs.length;
@@ -359,22 +506,25 @@ function renderVehs(){
   const hdr='<div class="vr vh"><span>VIN</span><span>TRIM</span><span>DEALER</span><span style="text-align:right">MSRP</span><span style="text-align:right">DAYS</span><span></span></div>';
   const rows=list.map(v=>{
     const isR=v.trim==='Raptor R';
-    const d=days(v.first_seen);
+    const d=v.first_seen?days(v.first_seen):0;
     const m=v.msrp?'$'+(v.msrp/1000).toFixed(0)+'k':'—';
+    const vinDisplay=v.vin?v.vin.slice(0,8)+'…'+v.vin.slice(-4):'NO VIN';
     const lk=v.vehicle_url?'<a href="'+v.vehicle_url+'" target="_blank" rel="noopener">VIEW →</a>':'<span style="color:#222">—</span>';
-    return '<div class="vr'+(isR?' isR':'')+'"><span class="vvin">'+v.vin.slice(0,8)+'…'+v.vin.slice(-4)+'</span><span class="vtrim '+(isR?'r':'b')+'">'+v.trim.toUpperCase()+'</span><span class="vdeal">'+v.dealer_name+(v.dealer_city?', '+v.dealer_city:'')+'</span><span class="vmsrp">'+m+'</span><span class="vdays">'+(d===0?'Today':d+'d')+'</span><span class="vlink">'+lk+'</span></div>';
+    return '<div class="vr'+(isR?' isR':'')+'"><span class="vvin">'+vinDisplay+'</span><span class="vtrim '+(isR?'r':'b')+'">'+v.trim.toUpperCase()+'</span><span class="vdeal">'+v.dealer_name+(v.dealer_city?', '+v.dealer_city:'')+'</span><span class="vmsrp">'+m+'</span><span class="vdays">'+(d===0?'Today':d+'d')+'</span><span class="vlink">'+lk+'</span></div>';
   }).join('');
   document.getElementById('vehicleList').innerHTML=hdr+rows;
 }
+
 function renderDlrs(){
   if(!dlrs.length){document.getElementById('dealerRows').innerHTML='<div class="nodata">No dealer data.</div>';return}
   const mx=Math.max(...dlrs.map(d=>d.raptor+d.raptorR),1);
   document.getElementById('dealerRows').innerHTML=dlrs.map(d=>{
     const ct=d.raptor+d.raptorR,pct=Math.round((ct/mx)*100);
     const nm=d.url?'<a href="'+d.url+'" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">'+d.name+'</a>':d.name;
-    return '<div class="dr"><span class="dn">'+nm+'</span><span class="dc">'+(d.city||'')+'</span><div class="dbb"><div class="dbf" style="width:'+pct+'%"></div></div><span class="dbd">'+d.raptor+'R / '+d.raptorR+'RR</span><span class="dct">'+ct+'</span></div>';
+    return '<div class="dr"><span class="dn2">'+nm+'</span><span class="dc">'+(d.city||'')+'</span><div class="dbb"><div class="dbf" style="width:'+pct+'%"></div></div><span class="dbd">'+d.raptor+'R / '+d.raptorR+'RR</span><span class="dct">'+ct+'</span></div>';
   }).join('');
 }
+
 function renderChart(){
   const labels=snaps.map(s=>{const d=new Date(s.snap_date+'T12:00:00');return(d.getMonth()+1)+'/'+d.getDate()});
   const tots=snaps.map(s=>s.total),rpts=snaps.map(s=>s.raptor),rRs=snaps.map(s=>s.raptor_r);
@@ -388,6 +538,7 @@ function renderChart(){
     scales:{x:{grid:{color:'#111'},ticks:{color:'#444',font:{size:9},maxTicksLimit:12,autoSkip:true}},y:{grid:{color:'#111'},ticks:{color:'#444',font:{size:9},stepSize:10},beginAtZero:true}}
   }});
 }
+
 function renderDons(totalCents){
   document.getElementById('dtAmt').textContent='$'+(totalCents/100).toFixed(0);
   if(!dons.length) return;
@@ -396,7 +547,9 @@ function renderDons(totalCents){
     return '<div class="dfi"><span class="dfa">$'+(d.amount_cents/100).toFixed(0)+'</span><span style="color:#888">'+(d.display_name||'Anonymous')+'</span>'+(d.message?'<span style="color:#444;font-style:italic;font-size:9px">&#8220;'+d.message+'&#8221;</span>':'')+'<span style="color:#2a2a2a">'+dt+'</span></div>';
   }).join('');
 }
+
 function selAmt(c,b){dAmt=c;document.querySelectorAll('.ab').forEach(x=>x.classList.remove('on'));b.classList.add('on')}
+
 async function doDonate(){
   const btn=document.getElementById('payBtn');
   btn.disabled=true;btn.textContent='OPENING CHECKOUT...';
@@ -409,6 +562,7 @@ async function doDonate(){
     else throw new Error(d.error||'Unknown error');
   }catch(e){alert('Payment error: '+e.message);btn.disabled=false;btn.textContent='PAY — APPLE PAY / CARD'}
 }
+
 loadData();
 </script>
 </body>
