@@ -9,8 +9,8 @@ export default async function handler(req, res) {
   const today = new Date().toISOString().split('T')[0];
   console.log(`[cron] ${today} — starting`);
 
-  // scrapeRaptors now includes WTI price from OpenAI search
-  // fetchWTI is a fallback if scraper didn't get it
+  // Run inventory scrape and WTI price fetch in parallel
+  // fetchWTI uses EIA (official gov data) first, Yahoo as fallback
   const [invResult, wtiResult] = await Promise.allSettled([
     scrapeRaptors(),
     fetchWTI(),
@@ -22,9 +22,11 @@ export default async function handler(req, res) {
 
   if (invResult.status === 'rejected') console.error('[cron] scrape error:', invResult.reason?.message);
 
-  // Use WTI price from scraper if available, otherwise fall back to fetchWTI
-  const wtiPrice = inv.wtiPrice ||
-    (wtiResult.status === 'fulfilled' ? wtiResult.value?.price : null);
+  // Prefer fetchWTI (EIA official data) over OpenAI search result
+  const wtiFromEIA   = wtiResult.status === 'fulfilled' ? wtiResult.value?.price : null;
+  const wtiFromScraper = inv.wtiPrice || null;
+  const wtiPrice = wtiFromEIA || wtiFromScraper;
+  console.log(`[cron] WTI — EIA: $${wtiFromEIA}, scraper: $${wtiFromScraper}, using: $${wtiPrice}`);
 
   const wtiObj = { price: wtiPrice };
   console.log(`[cron] ${inv.total} vehicles, WTI $${wtiPrice}`);
