@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         .limit(90),
 
       supabase.from('vehicles')
-        .select('vin, model_year, model, trim, color, msrp, dealer_name, dealer_city, dealer_state, vehicle_url, dealer_url, first_seen, last_seen')
+        .select('vin, model_year, model, trim, color, msrp, dealer_name, dealer_city, dealer_state, vehicle_url, dealer_url, dealer_lat, dealer_lng, first_seen, last_seen')
         .eq('active', true)
         .order('dealer_name', { ascending: true }),
 
