@@ -208,11 +208,7 @@ footer a:hover{color:var(--muted)}
   <div class="pb"><span class="pl">Brent</span><span class="pv" id="brtV">—</span></div>
   <span class="vsep">|</span>
   <div class="pb"><span class="pl">Updated</span><span style="font-size:11px;color:var(--muted)" id="asOf">—</span></div>
-  <div class="frow">
-    <button class="fb on" onclick="setF('all',this)">ALL</button>
-    <button class="fb" onclick="setF('raptor',this)">RAPTOR</button>
-    <button class="fb" onclick="setF('raptorR',this)">RAPTOR R</button>
-  </div>
+
 </div>
 
 <div class="donate-strip">
@@ -242,10 +238,8 @@ footer a:hover{color:var(--muted)}
   <div class="donate-feed" id="dfeed"></div>
 </div>
 
-<div class="stats-row">
-  <div class="sc"><div class="sl">Total In Stock</div><div class="sn" id="tot">—</div><div class="ss fl" id="totD">loading...</div></div>
-  <div class="sc"><div class="sl">Ford Raptor</div><div class="sn" id="rpt">—</div><div class="ss fl">F-150 · verified trim</div></div>
-  <div class="sc"><div class="sl">Raptor R</div><div class="sn" id="rptR">—</div><div class="ss fl">5.2L supercharged</div></div>
+<div class="stats-row" style="grid-template-columns:1fr">
+  <div class="sc"><div class="sl">F-150 Raptors In Stock · 100-mile radius · Midland TX</div><div class="sn" id="tot">—</div><div class="ss fl" id="totD">loading...</div></div>
 </div>
 
 <div class="signal-card">
@@ -271,11 +265,7 @@ footer a:hover{color:var(--muted)}
 
 <div class="vehicles-section">
   <div class="section-label">Active vehicles on lots · VIN-verified · click to view at dealer</div>
-  <div class="trow">
-    <button class="tb on" onclick="setVTab('all',this)">ALL (<span id="tAll">—</span>)</button>
-    <button class="tb" onclick="setVTab('raptorR',this)">RAPTOR R (<span id="tRR">—</span>)</button>
-    <button class="tb" onclick="setVTab('raptor',this)">RAPTOR (<span id="tR">—</span>)</button>
-  </div>
+
   <div id="vehicleList"><div class="nodata">Loading vehicles...</div></div>
 </div>
 
@@ -327,7 +317,7 @@ footer a:hover{color:var(--muted)}
 // Secrets are never exposed to the browser.
 
 let snaps=[],vehs=[],dlrs=[],dons=[],knownDealers=[];
-let fMode='all',vTab='all',dAmt=500,tc=null;
+let dAmt=500,tc=null;
 
 document.getElementById('yr').textContent=new Date().getFullYear();
 
@@ -337,8 +327,7 @@ if(new URLSearchParams(location.search).get('donated')==='1'){
   history.replaceState({},'','/');
 }
 
-function setF(f,b){fMode=f;document.querySelectorAll('.fb').forEach(x=>x.classList.remove('on'));b.classList.add('on');renderStats()}
-function setVTab(t,b){vTab=t;document.querySelectorAll('.tb').forEach(x=>x.classList.remove('on'));b.classList.add('on');renderVehs()}
+
 
 // ── LOAD DATA ─────────────────────────────────────────────
 // ONLY reads from /api/data — no client-side scraping, no API keys in browser
@@ -385,13 +374,8 @@ async function loadData(){
 function renderStats(){
   if(!snaps.length) return;
   const l=snaps[snaps.length-1],p=snaps.length>1?snaps[snaps.length-2]:null;
-  let tot,rd,rRd;
-  if(fMode==='raptor'){tot=l.raptor;rd=l.raptor;rRd=0}
-  else if(fMode==='raptorR'){tot=l.raptor_r;rd=0;rRd=l.raptor_r}
-  else{tot=l.total;rd=l.raptor;rRd=l.raptor_r}
-  document.getElementById('tot').textContent=tot;
-  document.getElementById('rpt').textContent=rd;
-  document.getElementById('rptR').textContent=rRd;
+  document.getElementById('tot').textContent=l.total;
+  document.getElementById('tAll').textContent=l.total;
   if(p){
     const d=l.total-p.total,el=document.getElementById('totD');
     el.textContent=d>0?'▲ +'+d+' vs yesterday':d<0?'▼ '+Math.abs(d)+' vs yesterday':'▶ no change';
@@ -432,11 +416,7 @@ function safeUrl(url){
 }
 
 function renderVehs(){
-  const rR=vehs.filter(v=>v.trim==='Raptor R'),base=vehs.filter(v=>v.trim!=='Raptor R');
-  document.getElementById('tAll').textContent=vehs.length;
-  document.getElementById('tRR').textContent=rR.length;
-  document.getElementById('tR').textContent=base.length;
-  const list=vTab==='raptorR'?rR:vTab==='raptor'?base:vehs;
+  const list=vehs;
   if(!list.length){
     document.getElementById('vehicleList').innerHTML='<div class="no-vehicles">No '+esc(vTab)+' trucks in stock within 150 miles right now.</div>';
     return;
