@@ -15,7 +15,7 @@
 :root{
   --gold:#f0a500;--gold-dim:#c8860a;--red:#e05555;--green:#4caf50;
   --bg0:#0a0a0a;--bg1:#111;--bg2:#181818;--border:#242424;--border2:#333;
-  --text:#e8e0cc;--muted:#888;--dim:#555;--faint:#3a3a3a;
+  --text:#e8e0cc;--muted:#aaa;--dim:#888;--faint:#666;
   --mono:'JetBrains Mono','Courier New',monospace;--display:'Bebas Neue',Impact,sans-serif;
 }
 body{background:var(--bg0);color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.5;min-height:100vh}
@@ -60,19 +60,18 @@ header{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 2
 .dfi{display:flex;align-items:center;gap:6px;padding:2px 8px;background:var(--bg2);font-size:10px;color:var(--dim)}
 .dfa{font-family:var(--display);font-size:15px;color:var(--gold-dim)}
 .dsuccess{color:var(--green);font-size:11px;margin-top:5px;display:none}
-.stats-row{background:var(--border);border-bottom:1px solid var(--border)}
-.sc{background:var(--bg1);padding:18px 20px}
-.sl{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
-.sn{font-family:var(--display);font-size:72px;line-height:1;color:var(--gold)}
-.ss{font-size:10px;margin-top:4px;color:var(--dim)}
+.stats-signal{background:var(--bg1);border-bottom:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.sl{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+.sn{font-family:var(--display);font-size:80px;line-height:1;color:var(--gold)}
+.count-meta{display:flex;flex-direction:column;gap:4px;justify-content:center}
+.ss{font-size:11px;color:var(--dim)}
 .ss.up{color:var(--green)}.ss.dn{color:var(--red)}.ss.fl{color:var(--dim)}
-.signal-card{background:var(--bg1);padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.sig-lbl{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
-.sig-wrap{flex:1;min-width:180px}
-.sig-ends{display:flex;justify-content:space-between;font-size:8px;color:var(--faint);letter-spacing:1px;margin-bottom:4px}
-.sig-bg{height:8px;background:var(--bg2);border-radius:4px;overflow:hidden}
-.sig-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#1e5c20,#c8860a,#7a1a1a);transition:width 1s ease}
-.sig-txt{font-size:11px;color:var(--muted);margin-top:5px}
+.sig-divider{width:1px;height:60px;background:var(--border2);flex-shrink:0}
+.sig-wrap{flex:1;min-width:220px}
+.sig-ends{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:6px}
+.sig-bg{height:10px;background:var(--bg2);border-radius:5px;overflow:hidden}
+.sig-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,#1e5c20,#c8860a,#7a1a1a);transition:width 1s ease}
+.sig-txt{font-size:12px;color:var(--text);margin-top:6px}
 .chart-section{background:var(--bg1);padding:14px 20px;border-bottom:1px solid var(--border)}
 .section-label{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
 .cleg{display:flex;gap:16px;margin-bottom:8px}
@@ -82,7 +81,7 @@ header{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 2
 #vehicleList{display:flex;flex-direction:column;gap:1px}
 .vr{background:var(--bg1);display:grid;grid-template-columns:90px 82px 1fr 90px 70px 86px;align-items:center;gap:8px;padding:9px 12px;font-size:10px;color:var(--muted);border-left:3px solid transparent;transition:all .12s}
 .vr:hover{border-left-color:var(--gold-dim);background:var(--bg2)}
-.vvin{font-family:var(--mono);font-size:9px;color:var(--faint);letter-spacing:1px}
+.vvin{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px}
 .vtrim{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;color:var(--gold);background:#1a1000;border:1px solid #3a2500}
 .vdeal{color:#999;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vmsrp{text-align:right;font-family:var(--display);font-size:19px;color:var(--gold)}
@@ -153,17 +152,6 @@ footer a:hover{color:var(--muted)}
   <span class="friend-text">Check out a friend's site: <a href="https://isoilabove100.com" target="_blank" rel="noopener">isoilabove100.com</a> — live WTI &amp; Brent crude prices</span>
   <a class="friend-btn" href="https://isoilabove100.com" target="_blank" rel="noopener">IS OIL ABOVE $100? →</a>
 </div>
-
-<div class="lbanner" id="lb">LOADING INVENTORY DATA...</div>
-
-<div class="price-strip">
-  <div class="pb"><span class="pl">WTI</span><span class="pv" id="wtiV">—</span></div>
-  <span class="vsep">|</span>
-  <div class="pb"><span class="pl">Brent</span><span class="pv" id="brtV">—</span></div>
-  <span class="vsep">|</span>
-  <div class="pb"><span class="pl">Updated</span><span style="font-size:11px;color:var(--muted)" id="asOf">—</span></div>
-</div>
-
 <div class="donate-strip">
   <div class="donate-strip-inner">
     <div>
@@ -191,20 +179,34 @@ footer a:hover{color:var(--muted)}
   <div class="donate-feed" id="dfeed"></div>
 </div>
 
-<div class="stats-row">
-  <div class="sc">
-    <div class="sl">Ford F-150 Raptors In Stock · 100-mile radius · Midland TX</div>
-    <div class="sn" id="tot">—</div>
-    <div class="ss fl" id="totD">loading...</div>
-  </div>
+<div class="lbanner" id="lb">LOADING INVENTORY DATA...</div>
+
+<div class="price-strip">
+  <div class="pb"><span class="pl">WTI</span><span class="pv" id="wtiV">—</span></div>
+  <span class="vsep">|</span>
+  <div class="pb"><span class="pl">Brent</span><span class="pv" id="brtV">—</span></div>
+  <span class="vsep">|</span>
+  <div class="pb"><span class="pl">Updated</span><span style="font-size:11px;color:var(--muted)" id="asOf">—</span></div>
 </div>
 
-<div class="signal-card">
-  <span class="sig-lbl">OFS Signal</span>
+
+<div class="lbanner" id="lb">LOADING INVENTORY DATA...</div>
+
+
+
+<div class="stats-signal">
+  <div>
+    <div class="sl">F-150 Raptors in stock · 100mi · Midland TX</div>
+    <div class="sn" id="tot">—</div>
+  </div>
+  <div class="count-meta">
+    <div class="ss fl" id="totD">loading...</div>
+    <div class="sig-txt" id="sigT" style="font-size:11px;margin-top:0;font-weight:normal;color:var(--muted)">Awaiting data...</div>
+  </div>
+  <div class="sig-divider"></div>
   <div class="sig-wrap">
     <div class="sig-ends"><span>LOW STOCK = BOOM ▶</span><span>◀ HIGH STOCK = BUST</span></div>
     <div class="sig-bg"><div class="sig-fill" id="sigF" style="width:50%"></div></div>
-    <div class="sig-txt" id="sigT">Awaiting data...</div>
   </div>
 </div>
 
