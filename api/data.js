@@ -1,9 +1,9 @@
 // GET /api/data — returns all data the frontend needs
+// Dealer list is built dynamically from active vehicles — no static list needed
 import { supabase } from '../lib/supabase.js';
-import { DEALERS }  from '../lib/dealers.js';
 
 export default async function handler(req, res) {
-  res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=7200');
+  res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
   res.setHeader('Access-Control-Allow-Origin', '*');
 
   try {
@@ -16,7 +16,6 @@ export default async function handler(req, res) {
       supabase.from('vehicles')
         .select('vin, model_year, model, trim, color, msrp, dealer_name, dealer_city, dealer_state, vehicle_url, dealer_url, first_seen, last_seen')
         .eq('active', true)
-        .order('trim', { ascending: false })
         .order('dealer_name', { ascending: true }),
 
       supabase.from('donations')
@@ -25,18 +24,20 @@ export default async function handler(req, res) {
         .limit(20),
     ]);
 
-    // Build dealer summary from active vehicles + seed with all known dealers at 0
+    // Build dealer summary from active vehicles — no static list
+    // Marketcheck data tells us exactly which dealers have stock
     const dealerMap = new Map();
-    for (const d of DEALERS) {
-      dealerMap.set(d.name, { name: d.name, city: d.city, state: d.state, url: d.url, miles: d.miles, raptor: 0, raptorR: 0 });
-    }
     for (const v of (vehiclesRes.data || [])) {
-      const key = [...dealerMap.keys()].find(k =>
-        k.toLowerCase().includes((v.dealer_name||'').toLowerCase().split(' ')[0]) ||
-        (v.dealer_name||'').toLowerCase().includes(k.toLowerCase().split(' ')[0])
-      ) || v.dealer_name;
+      const key = v.dealer_name;
       if (!dealerMap.has(key)) {
-        dealerMap.set(key, { name: v.dealer_name, city: v.dealer_city, state: v.dealer_state, url: v.dealer_url, miles: null, raptor: 0, raptorR: 0 });
+        dealerMap.set(key, {
+          name:    v.dealer_name,
+          city:    v.dealer_city,
+          state:   v.dealer_state || 'TX',
+          url:     v.dealer_url   || null,
+          raptor:  0,
+          raptorR: 0,
+        });
       }
       const d = dealerMap.get(key);
       if (v.trim === 'Raptor R') d.raptorR++; else d.raptor++;
@@ -45,17 +46,16 @@ export default async function handler(req, res) {
     const dealers = Array.from(dealerMap.values())
       .sort((a, b) => (b.raptor + b.raptorR) - (a.raptor + a.raptorR));
 
-    const allDonations     = donationsRes.data || [];
+    const allDonations      = donationsRes.data || [];
     const totalDonatedCents = allDonations.reduce((s, d) => s + (d.amount_cents || 0), 0);
 
     return res.status(200).json({
-      snapshots:          snapshotsRes.data  || [],
-      vehicles:           vehiclesRes.data   || [],
+      snapshots:         snapshotsRes.data || [],
+      vehicles:          vehiclesRes.data  || [],
       dealers,
-      knownDealers:       DEALERS,
-      donations:          allDonations,
+      donations:         allDonations,
       totalDonatedCents,
-      generatedAt:        new Date().toISOString(),
+      generatedAt:       new Date().toISOString(),
     });
 
   } catch (err) {
