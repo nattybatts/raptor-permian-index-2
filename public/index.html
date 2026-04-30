@@ -155,21 +155,11 @@ header{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 2
 .cll{width:16px;height:2px;border-radius:1px}
 .vehicles-section{background:var(--bg0);padding:14px 20px;border-bottom:1px solid var(--border)}
 #vehicleList{display:flex;flex-direction:column;gap:1px}
-.vr{background:var(--bg1);display:grid;grid-template-columns:90px 82px 80px 1fr 90px 70px 86px;align-items:center;gap:8px;padding:9px 12px;font-size:10px;color:var(--muted);border-left:3px solid transparent;transition:all .12s}
+.vr{background:var(--bg1);display:grid;grid-template-columns:90px 82px 1fr 90px 70px 86px;align-items:center;gap:8px;padding:9px 12px;font-size:10px;color:var(--muted);border-left:3px solid transparent;transition:all .12s}
 .vr:hover{border-left-color:var(--gold-dim);background:var(--bg2)}
-.vr-rr{border-left-color:#8b1a1a!important;background:#0f0808}
-.vr-rr:hover{border-left-color:#c0392b!important;background:#1a0a0a}
-.vr-rr .vmsrp{color:#ff9060}
-.vr-rr .vtrim{color:#ff7070;background:#1a0808;border-color:#5a1515;letter-spacing:2px}
 .vr-link{cursor:pointer}
 .vvin{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px}
 .vtrim{font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:2px;color:var(--gold);background:#1a1000;border:1px solid #3a2500}
-.vtrim.rr{color:#ff7070;background:#1a0808;border:1px solid #3a1515}
-.vstat-cell{display:flex;align-items:center}
-.vstat-hdr{font-size:8px}
-.vstat{font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 5px;border-radius:2px;white-space:nowrap}
-.vstat.transit{color:var(--gold);background:#1a1000;border:1px solid #3a2500}
-.vstat.lot{color:var(--green);background:#0a1a0a;border:1px solid #2a4a2a}
 .vdeal{color:#999;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vmsrp{text-align:right;font-family:var(--display);font-size:19px;color:var(--gold)}
 .vmsrp.no-price{color:var(--faint);font-size:14px}
@@ -222,7 +212,7 @@ footer a:hover{color:var(--muted)}
   header,.price-strip,.vehicles-section,.dealer-section,.pane,.donate-strip,.stats-signal,.signal-card,.chart-section,.map-section{padding:10px 14px}
   /* Vehicle rows: just TRIM | DEALER | PRICE on mobile */
   .vr{grid-template-columns:70px 1fr auto auto;gap:6px;padding:10px 14px}
-  .vlink,.vvin,.vstat-cell,.vstat-hdr,.vh span:nth-child(1),.vh span:nth-child(5),.vh span:nth-child(6){display:none}
+  .vlink,.vvin,.vh span:nth-child(1),.vh span:nth-child(5),.vh span:nth-child(6){display:none}
   .vh{grid-template-columns:70px 1fr auto auto}
   .vdays{font-size:9px;color:var(--muted)}
   .vmsrp{font-size:16px}
@@ -235,7 +225,8 @@ footer a:hover{color:var(--muted)}
   .lbanner{order:2}
   .price-strip{order:3}
   .friend-bar{order:4}
-  .stats-signal{order:5}
+  .em-bar{order:5}
+  .stats-signal{order:6}
   .days-metrics{order:7}
   .donate-strip{order:8}
   .vehicles-section{order:9}
@@ -264,6 +255,14 @@ footer a:hover{color:var(--muted)}
   .sig-divider{display:none}
   .sig-wrap{min-width:100%;order:3}
 }
+
+.em-bar{background:#0a0800;border-bottom:1px solid #2a2000;padding:7px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.em-left{display:flex;align-items:center;gap:8px;font-size:11px;color:#8a7a4a}
+.em-icon{font-size:14px}
+.em-text strong{color:var(--gold)}
+.em-btn{background:transparent;border:1px solid #4a3a00;color:var(--gold-dim);font-family:var(--mono);font-size:9px;padding:5px 12px;text-decoration:none;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.em-btn:hover{background:#1a1200;border-color:var(--gold);color:var(--gold)}
+@media(max-width:680px){.em-bar{padding:7px 14px}.em-btn{width:100%;text-align:center}}
 </style>
 <script defer src="/_vercel/insights/script.js"></script>
 <body>
@@ -289,6 +288,14 @@ footer a:hover{color:var(--muted)}
 <div class="friend-bar">
   <span class="friend-text">Check out a friend's site: <a href="https://isoilabove100.com" target="_blank" rel="noopener">isoilabove100.com</a> — live WTI &amp; Brent crude prices</span>
   <a class="friend-btn" href="https://isoilabove100.com" target="_blank" rel="noopener">IS OIL ABOVE $100? →</a>
+</div>
+
+<div class="em-bar">
+  <div class="em-left">
+    <span class="em-icon">🛢️</span>
+    <span class="em-text">Got minerals? <strong>Trade your minerals for a Ford Raptor</strong> — sell your oil &amp; gas assets fast</span>
+  </div>
+  <a class="em-btn" href="https://www.efficientmarkets.com/" target="_blank" rel="noopener">GET YOUR RAPTOR →</a>
 </div>
 
 <div class="donate-strip">
@@ -555,46 +562,21 @@ function renderVehs(){
   }
   const today=new Date();
   const days=s=>s?Math.floor((today-new Date(s+'T12:00:00'))/(864e5)):0;
-  const sortKey=window._sortKey||'days';
-  const sortDir=window._sortDir||-1;
-  function getSortVal(v){
-    if(sortKey==='days'){
-      const dl=v.first_listed?Math.floor((Date.now()-new Date(v.first_listed))/(864e5)):null;
-      return dl!=null?dl:(v.days_on_lot||0);
-    }
-    if(sortKey==='price') return v.msrp||0;
-    return 0;
-  }
-  const hdr='<div class="vr vh">'
-    +'<span>VIN</span>'
-    +'<span>TRIM</span>'+'<span class="vstat-hdr">STATUS</span>'
-    +'<span>DEALER</span>'
-    +'<span style="text-align:right;cursor:pointer" onclick="sortVehs(\'price\')" id="hdrPrice">PRICE '+(sortKey==='price'?(sortDir>0?'▲':'▼'):'↕')+'</span>'
-    +'<span style="text-align:right;cursor:pointer" onclick="sortVehs(\'days\')" id="hdrDays">DAYS ON LOT '+(sortKey==='days'?(sortDir>0?'▲':'▼'):'↕')+'</span>'
-    +'<span></span>'
-    +'</div>';
-  const sorted=[...vehs].sort((a,b)=>(getSortVal(a)-getSortVal(b))*sortDir);
-  const rows=sorted.map(v=>{
+  const hdr='<div class="vr vh"><span>VIN</span><span>TRIM</span><span>DEALER</span><span style="text-align:right">PRICE</span><span style="text-align:right">DAYS ON LOT</span><span></span></div>';
+  const rows=vehs.map(v=>{
     const d=days(v.first_seen);
     const price=v.msrp?'<span class="vmsrp">$'+Math.round(v.msrp/1000)+'k</span>':'<span class="vmsrp no-price">—</span>';
     const vin=v.vin?esc(v.vin.slice(0,4))+'…'+esc(v.vin.slice(-4)):'—';
     const url=safeUrl(v.vehicle_url);
     const lk=url?'<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">VIEW →</a>':'<span style="color:#222">—</span>';
-    const isRR=(v.engine_size>=5.0)||(v.trim==='Raptor R');
-    const cls='vr'+(url?' vr-link':'')+(isRR?' vr-rr':'');
+    const cls='vr'+(url?' vr-link':'');
     const attrs=(url?' data-url="'+esc(url)+'"':'')+(v.vin?' data-vin="'+esc(v.vin)+'"':'');
     return '<div class="'+cls+'"'+attrs+'>'
       +'<span class="vvin">'+vin+'</span>'
-      +'<span class="vtrim '+(v.in_transit===false&&v.days_on_lot>0?'':'')+'">'+((v.engine_size||0)>=5.0?'RAPTOR R':'RAPTOR')+'</span>'
-      +'<span class="vstat-cell"><span class="vstat '+(v.in_transit?'transit':'lot')+'">'+(v.in_transit?'TRANSIT':'ON LOT')+'</span></span>'
+      +'<span class="vtrim">RAPTOR</span>'
       +'<span class="vdeal">'+esc(v.dealer_name)+'<br><span style="font-size:9px;color:var(--faint)">'+esc(v.dealer_city||'')+'</span></span>'
       +price
-      +(function(){
-      const dl=v.first_listed?Math.floor((Date.now()-new Date(v.first_listed))/(864e5)):null;
-      const fs=v.first_seen?Math.floor((Date.now()-new Date(v.first_seen+'T12:00:00'))/(864e5)):null;
-      const days=dl!=null?dl:(v.days_on_lot||0);
-      return '<span class="vdays" data-days="'+days+'">'+(days>0?days+'d':'<1d')+'</span>';
-    })()
+      +'<span class="vdays">'+(v.days_on_lot>0?v.days_on_lot+'d':'—')+'</span>'
       +'<span class="vlink">'+lk+'</span>'
       +'</div>';
   }).join('');
@@ -703,13 +685,6 @@ function renderMap(){
   }
 
   map.addLayer(markers);
-}
-
-function sortVehs(key){
-  // sortKey/sortDir are defined inside renderVehs scope, so re-render
-  window._sortKey=key;
-  window._sortDir=(window._sortKey===key?(window._sortDir||1)*-1:1);
-  renderVehs();
 }
 
 function renderDaysMetrics(m){
@@ -839,10 +814,7 @@ async function openVehModal(vin, vehicleData){
     const diffStr=diff!=null?(diff>0?'+$'+diff.toLocaleString()+' over MSRP':diff<0?'$'+Math.abs(diff).toLocaleString()+' below MSRP':'At MSRP'):'—';
     const diffClass=diff!=null?(diff>0?'red':diff<0?'green':'dim'):'dim';
 
-    // Calculate days from first_seen_at_date — more accurate than dom
-    // dom counts from when ANY source first saw the VIN, not when dealer listed it
-    const firstSeenDate=v.first_seen_at_date?new Date(v.first_seen_at_date):null;
-    const dom=firstSeenDate?Math.floor((Date.now()-firstSeenDate)/(864e5)):(v.dom||vehicleData.days_on_lot||0);
+    const dom=v.dom||vehicleData.days_on_lot||0;
     const status=v.in_transit?'IN TRANSIT':'ON LOT';
     const statusClass=v.in_transit?'transit':'lot';
     const firstListed=v.first_seen_at_date?new Date(v.first_seen_at_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
@@ -862,7 +834,7 @@ async function openVehModal(vin, vehicleData){
         '<div class="vm-section">'+
           '<div class="vm-section-title">Inventory Status</div>'+
           '<div class="vm-row"><span class="vm-label">Status</span><span class="vm-val"><span class="vm-status '+statusClass+'">'+status+'</span></span></div>'+
-          '<div class="vm-row"><span class="vm-label">'+(v.in_transit?'Days Listed':'Days on Lot')+'</span><span class="vm-val">'+(dom||'0')+' days'+(v.in_transit?' (not yet on lot)':'')+'</span></div>'+
+          '<div class="vm-row"><span class="vm-label">Days on Lot</span><span class="vm-val">'+(dom||'0')+' days</span></div>'+
           '<div class="vm-row"><span class="vm-label">First Listed</span><span class="vm-val">'+firstListed+'</span></div>'+
         '</div>'+
         '<div class="vm-section">'+
