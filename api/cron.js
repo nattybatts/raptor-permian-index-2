@@ -1,4 +1,4 @@
-import { scrapeRaptors, generateCommentary } from '../lib/scraper.js';
+import { scrapeRaptors, fetchWTI, generateCommentary } from '../lib/scraper.js';
 import { supabase } from '../lib/supabase.js';
 
 export default async function handler(req, res) {
@@ -7,21 +7,19 @@ export default async function handler(req, res) {
   }
 
   const today = new Date().toISOString().split('T')[0];
-  console.log(`[cron] ${today} — starting`);
+  console.log(`[cron] ${today} — starting Marketcheck scrape`);
 
-  // scrapeRaptors() handles both inventory AND WTI internally via parallel calls
-  // Do NOT call fetchWTI() separately — that causes Yahoo fallback to win
-  let inv;
+  let inv, wti;
   try {
-    inv = await scrapeRaptors();
+    [inv, wti] = await Promise.all([scrapeRaptors(), fetchWTI()]);
   } catch (err) {
-    console.error('[cron] scrape fatal:', err.message);
-    inv = { total: 0, raptor: 0, raptorR: 0, vehicles: [], dealers: [], wtiPrice: null, commentary: null };
+    console.error('[cron] fatal:', err.message);
+    return res.status(500).json({ error: err.message });
   }
 
-  const wtiPrice  = inv.wtiPrice || null;
-  const commentary = inv.commentary || generateCommentary(inv.total, { price: wtiPrice });
-  console.log(`[cron] ${inv.total} vehicles, WTI: $${wtiPrice}`);
+  const wtiPrice   = wti?.price || null;
+  const commentary = generateCommentary(inv.total, wti);
+  console.log(`[cron] ${inv.total} vehicles, WTI $${wtiPrice}`);
 
   // Save snapshot
   const { error: snapErr } = await supabase
@@ -35,20 +33,19 @@ export default async function handler(req, res) {
       commentary,
       scraped_at: new Date().toISOString(),
     }, { onConflict: 'snap_date' });
-
   if (snapErr) console.error('[cron] snapshot error:', snapErr.message);
 
-  // Wipe today's vehicles and reinsert clean — no accumulation across runs
+  // Wipe today's vehicles and reinsert clean
   await supabase.from('vehicles').delete().eq('last_seen', today);
   await supabase.from('vehicles').update({ active: false }).eq('active', true);
 
   if (inv.vehicles.length > 0) {
-    const rows = inv.vehicles.map((v, i) => ({
-      vin:          v.vin || `SRCH-${today}-${i}`.slice(0, 17),
+    const rows = inv.vehicles.map(v => ({
+      vin:          v.vin,
       model_year:   v.model_year,
       model:        'F-150',
       trim:         v.trim,
-      color:        null,
+      color:        v.color || null,
       msrp:         v.msrp || null,
       dealer_name:  v.dealer_name,
       dealer_city:  v.dealer_city,
@@ -60,10 +57,10 @@ export default async function handler(req, res) {
       active:       true,
     }));
 
-    const { error: insertErr } = await supabase
+    const { error: vErr } = await supabase
       .from('vehicles')
       .upsert(rows, { onConflict: 'vin', ignoreDuplicates: false });
-    if (insertErr) console.error('[cron] insert error:', insertErr.message);
+    if (vErr) console.error('[cron] vehicle error:', vErr.message);
   }
 
   console.log('[cron] complete ✓');
