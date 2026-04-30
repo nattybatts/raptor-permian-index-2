@@ -1,53 +1,45 @@
-// GET /api/test-key
-// Makes a minimal Anthropic API call to verify the key works
-// Remove after confirming
-
+// GET /api/test-key — tests both API keys
 export default async function handler(req, res) {
-  const key = process.env.ANTHROPIC_API_KEY;
-  
-  if (!key) {
-    return res.status(200).json({ status: 'ERROR', message: 'ANTHROPIC_API_KEY not set' });
-  }
+  const results = {};
 
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 20,
-        messages: [{ role: 'user', content: 'Say OK' }],
-      }),
-      signal: AbortSignal.timeout(10000),
-    });
-
-    const data = await res.json ? await response.json() : {};
-    
-    if (response.ok) {
-      return res.status(200).json({
-        status: 'SUCCESS',
-        message: 'API key works!',
-        http_status: response.status,
-        key_prefix: key.slice(0, 20) + '...',
-        response_preview: JSON.stringify(data).slice(0, 100),
+  // Test OpenAI
+  const oaiKey = process.env.OPENAI_API_KEY;
+  if (oaiKey) {
+    try {
+      const r = await fetch('https://api.openai.com/v1/models', {
+        headers: { 'Authorization': `Bearer ${oaiKey}` },
+        signal: AbortSignal.timeout(8000),
       });
-    } else {
-      return res.status(200).json({
-        status: 'FAILED',
-        http_status: response.status,
-        key_prefix: key.slice(0, 20) + '...',
-        error: JSON.stringify(data).slice(0, 200),
-      });
+      results.openai = r.ok
+        ? { status: 'SUCCESS', key_prefix: oaiKey.slice(0, 14) + '...' }
+        : { status: 'FAILED', http: r.status, key_prefix: oaiKey.slice(0, 14) + '...' };
+    } catch (e) {
+      results.openai = { status: 'ERROR', message: e.message };
     }
-  } catch (err) {
-    return res.status(200).json({
-      status: 'ERROR',
-      message: err.message,
-      key_prefix: key.slice(0, 20) + '...',
-    });
+  } else {
+    results.openai = { status: 'NOT SET' };
   }
+
+  // Test Anthropic
+  const antKey = process.env.ANTHROPIC_API_KEY;
+  if (antKey) {
+    try {
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': antKey, 'anthropic-version': '2023-06-01' },
+        body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: 10, messages: [{ role: 'user', content: 'hi' }] }),
+        signal: AbortSignal.timeout(8000),
+      });
+      const d = await r.json();
+      results.anthropic = r.ok
+        ? { status: 'SUCCESS', key_prefix: antKey.slice(0, 20) + '...' }
+        : { status: 'FAILED', http: r.status, error: d?.error?.message, key_prefix: antKey.slice(0, 20) + '...' };
+    } catch (e) {
+      results.anthropic = { status: 'ERROR', message: e.message };
+    }
+  } else {
+    results.anthropic = { status: 'NOT SET' };
+  }
+
+  res.status(200).json(results);
 }
