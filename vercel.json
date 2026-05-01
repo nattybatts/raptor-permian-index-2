@@ -11,8 +11,24 @@
       "destination": "/api/merch-page"
     },
     {
-      "source": "/merch/images/(.*)",
-      "destination": "/api/merch-image?file=$1"
+      "source": "/merch/images/black-hat.jpg",
+      "destination": "/api/merch-image?file=black-hat.jpg"
+    },
+    {
+      "source": "/merch/images/white-hat.jpg",
+      "destination": "/api/merch-image?file=white-hat.jpg"
+    },
+    {
+      "source": "/merch/images/black-trucker-gold.jpg",
+      "destination": "/api/merch-image?file=black-trucker-gold.jpg"
+    },
+    {
+      "source": "/merch/images/white-trucker-black.jpg",
+      "destination": "/api/merch-image?file=white-trucker-black.jpg"
+    },
+    {
+      "source": "/merch/images/diesel-surcharge.jpg",
+      "destination": "/api/merch-image?file=diesel-surcharge.jpg"
     },
     {
       "source": "/logo.png",
