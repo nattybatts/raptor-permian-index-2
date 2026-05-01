@@ -32,7 +32,7 @@
   --text:#e8e0cc;--muted:#aaa;--dim:#888;--faint:#666;
   --mono:'JetBrains Mono','Courier New',monospace;--display:'Bebas Neue',Impact,sans-serif;
 }
-body{background:var(--bg0);color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.5;min-height:100vh}
+body{background:var(--bg0);color:var(--text);font-family:var(--mono);font-size:14px;line-height:1.5;min-height:100vh}
 body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.025) 3px,rgba(0,0,0,.025) 4px);pointer-events:none;z-index:999}
 header{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .logo-title{font-family:var(--display);font-size:30px;color:var(--gold);letter-spacing:3px;line-height:1}
@@ -275,9 +275,9 @@ footer a:hover{color:var(--muted)}
   body{display:flex;flex-direction:column}
   header{order:1;padding:14px 16px}
   .lbanner{order:2}
-  .price-strip{order:3;padding:10px 16px}
-  .friend-bar{order:4;padding:7px 16px}
-  .em-bar{order:5;padding:7px 16px}
+  .friend-bar{order:3;padding:7px 16px}
+  .em-bar{order:4;padding:7px 16px}
+  .price-strip{order:5;padding:10px 16px}
   .stats-signal{order:6;padding:14px 16px}
   .days-metrics{order:7}
   .chart-section{order:8;display:block;padding:12px 16px}
@@ -297,31 +297,31 @@ footer a:hover{color:var(--muted)}
   .live-badge{font-size:8px;padding:4px 9px}
 
   /* ── PRICE STRIP ── */
-  .pv{font-size:22px}
-  .pl{font-size:8px}
+  .pv{font-size:26px}
+  .pl{font-size:10px}
 
   /* ── FRIEND / EM BAR ── */
   .friend-bar .friend-btn{width:100%;text-align:center;margin-top:4px}
-  .friend-text{font-size:10px}
+  .friend-text{font-size:12px}
   .em-btn{width:100%;text-align:center;margin-top:4px}
-  .em-text{font-size:10px}
+  .em-text{font-size:12px}
 
   /* ── STATS + SIGNAL ── */
   .stats-signal{flex-direction:column;gap:4px;align-items:center;text-align:center}
   .sn{font-size:72px;text-align:center;width:100%}
-  .sl{font-size:10px;letter-spacing:1px;text-align:center;width:100%}
-  .ss{font-size:12px;text-align:center}
+  .sl{font-size:11px;letter-spacing:1px;text-align:center;width:100%}
+  .ss{font-size:13px;text-align:center}
   .sig-divider{display:none}
   .count-meta{align-items:center;width:100%}
   .sig-wrap{min-width:100%;order:3}
   .sig-ends{font-size:8px}
-  .sig-txt{font-size:12px;margin-top:6px}
+  .sig-txt{font-size:13px;margin-top:6px}
 
   /* ── DAYS METRICS ── */
   .days-metrics{grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
   .dm-item{background:var(--bg1);padding:10px 12px}
-  .dm-val{font-size:24px}
-  .dm-label{font-size:8px}
+  .dm-val{font-size:28px}
+  .dm-label{font-size:10px}
   .dm-sep{display:none}
 
   /* ── CHART — compact but visible ── */
@@ -330,40 +330,40 @@ footer a:hover{color:var(--muted)}
 
   /* ── DONATE ── */
   .donate-strip-inner{gap:6px}
-  .dt-label{font-size:12px}
-  .dt-raised{font-size:18px}
+  .dt-label{font-size:14px}
+  .dt-raised{font-size:20px}
   .amts{gap:3px;flex-wrap:wrap}
-  .ab{padding:4px 9px;font-size:10px}
+  .ab{padding:5px 10px;font-size:11px}
   .dt-fields{flex-direction:column;align-items:stretch}
   #dname,#dmsg{display:none}
-  .paybtn{width:100%;padding:10px;font-size:11px}
+  .paybtn{width:100%;padding:11px;font-size:12px}
 
   /* ── VEHICLE TABLE ── */
   .vr{grid-template-columns:72px 1fr auto auto;gap:6px;padding:10px 14px}
   .vlink,.vvin,.vstat-cell,.vstat-hdr,.vh span:nth-child(1),.vh span:nth-child(5),.vh span:nth-child(6),.vbell{display:none}
   .vh{grid-template-columns:72px 1fr auto auto}
-  .vtrim{font-size:9px;padding:2px 5px}
-  .vdeal{font-size:11px}
-  .vmsrp{font-size:18px}
-  .vdays{font-size:10px;color:var(--muted)}
+  .vtrim{font-size:10px;padding:3px 6px}
+  .vdeal{font-size:12px}
+  .vmsrp{font-size:20px}
+  .vdays{font-size:11px;color:var(--muted)}
 
   /* ── MAP ── */
   #raptorMap{height:260px}
 
   /* ── DEALER TABLE ── */
   .dealer-table th:last-child,.dt-bar-bg,.dt-miles{display:none}
-  .dt-row td{padding:7px 8px;font-size:11px}
-  .dt-count{font-size:20px}
+  .dt-row td{padding:8px 8px;font-size:12px}
+  .dt-count{font-size:22px}
 
   /* ── ALERT STRIP ── */
   .alert-strip{padding:8px 16px}
   .alert-strip-inner{flex-direction:column;align-items:stretch;gap:6px}
-  .alert-select,.alert-input-sm,.alert-strip-btn{width:100%;font-size:11px;padding:8px 10px}
+  .alert-select,.alert-input-sm,.alert-strip-btn{width:100%;font-size:12px;padding:9px 10px}
 
   /* ── BOTTOM PANES ── */
   .pane{padding:14px 16px}
-  .cq{font-size:11px}
-  .stbl td{font-size:10px}
+  .cq{font-size:12px}
+  .stbl td{font-size:11px}
 }
 
 .em-bar{background:#0a0800;border-bottom:1px solid #2a2000;padding:7px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
@@ -387,19 +387,11 @@ footer a:hover{color:var(--muted)}
 
 <div class="lbanner" id="lb">LOADING INVENTORY DATA...</div>
 
-<div class="price-strip">
-  <div class="pb"><span class="pl">WTI</span><span class="pv" id="wtiV">—</span></div>
-  <span class="vsep">|</span>
-  <div class="pb"><span class="pl">Brent</span><span class="pv" id="brtV">—</span></div>
-  <span class="vsep">|</span>
-  <div class="pb"><span class="pl">Updated</span><span style="font-size:11px;color:var(--muted)" id="asOf">—</span></div>
-</div>
 
 <div class="friend-bar">
   <span class="friend-text">Check out <a href="https://x.com/Aubrey___K" target="_blank" rel="noopener">@Aubrey___K</a>'s website: <a href="https://isoilabove100.com" target="_blank" rel="noopener">isoilabove100.com</a> — live WTI &amp; Brent crude prices</span>
   <a class="friend-btn" href="https://isoilabove100.com" target="_blank" rel="noopener">IS OIL ABOVE $100? →</a>
 </div>
-
 <div class="em-bar">
   <div class="em-left">
     <span class="em-icon">🛢️</span>
@@ -407,7 +399,6 @@ footer a:hover{color:var(--muted)}
   </div>
   <a class="em-btn" href="https://www.efficientmarkets.com/" target="_blank" rel="noopener">GET YOUR RAPTOR →</a>
 </div>
-
 <div class="donate-strip">
   <div class="donate-strip-inner">
     <div class="don-title-row">
@@ -493,6 +484,15 @@ footer a:hover{color:var(--muted)}
     <div class="don-modal-list" id="donModalList"></div>
   </div>
 </div>
+
+<div class="price-strip">
+  <div class="pb"><span class="pl">WTI</span><span class="pv" id="wtiV">—</span></div>
+  <span class="vsep">|</span>
+  <div class="pb"><span class="pl">Brent</span><span class="pv" id="brtV">—</span></div>
+  <span class="vsep">|</span>
+  <div class="pb"><span class="pl">Updated</span><span style="font-size:11px;color:var(--muted)" id="asOf">—</span></div>
+</div>
+
 
 <div class="stats-signal">
   <div>
@@ -612,9 +612,7 @@ footer a:hover{color:var(--muted)}
   <span>PERMIAN RAPTOR INDEX &copy; <span id="yr"></span></span>
   <span>F-150 Raptor · 100mi/Midland TX · 8AM CT daily</span>
   <span>Not affiliated with Ford Motor Company</span>
-</footer>
-
-<!-- Vehicle Detail Modal -->
+</footer><!-- Vehicle Detail Modal -->
 <div class="veh-modal" id="vehModal" onclick="if(event.target===this)closeVehModal()">
   <div class="veh-modal-inner">
     <div class="veh-modal-header">
