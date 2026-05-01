@@ -6,10 +6,26 @@
     }
   ],
   "rewrites": [
-    { "source": "/logo.png", "destination": "/api/logo" },
-    { "source": "/", "destination": "/api/index" }
+    {
+      "source": "/merch",
+      "destination": "/api/merch-page"
+    },
+    {
+      "source": "/merch/images/(.*)",
+      "destination": "/api/merch-image?file=$1"
+    },
+    {
+      "source": "/logo.png",
+      "destination": "/api/logo"
+    },
+    {
+      "source": "/",
+      "destination": "/api/index"
+    }
   ],
   "functions": {
-    "api/cron.js": { "maxDuration": 300 }
+    "api/cron.js": {
+      "maxDuration": 300
+    }
   }
 }
