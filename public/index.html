@@ -271,54 +271,99 @@ footer a:hover{color:var(--muted)}
 .raptor-popup a:hover{text-decoration:underline}
 @media(max-width:680px){.map-section{display:none}}
 @media(max-width:680px){
-  .bottom-row{grid-template-columns:1fr}
-  .sn{font-size:56px}
-  header,.price-strip,.vehicles-section,.dealer-section,.pane,.donate-strip,.stats-signal,.signal-card,.chart-section,.map-section{padding:10px 14px}
-  /* Vehicle rows: just TRIM | DEALER | PRICE on mobile */
-  .vr{grid-template-columns:70px 1fr auto auto;gap:6px;padding:10px 14px}
-  .vlink,.vvin,.vstat-cell,.vstat-hdr,.vh span:nth-child(1),.vh span:nth-child(5),.vh span:nth-child(6){display:none}
-  .vh{grid-template-columns:70px 1fr auto auto}
-  .vdays{font-size:9px;color:var(--muted)}
-  .vmsrp{font-size:16px}
-  /* Hide chart on mobile only */
-  .chart-section{display:none}
-  /* Reorder donate section on mobile — move below stats */
+  /* ── LAYOUT ── */
   body{display:flex;flex-direction:column}
-  .donate-strip{order:5}
-  header{order:1}
+  header{order:1;padding:14px 16px}
   .lbanner{order:2}
-  .price-strip{order:3}
-  .friend-bar{order:4}
-  .em-bar{order:5}
-  .stats-signal{order:6}
+  .price-strip{order:3;padding:10px 16px}
+  .friend-bar{order:4;padding:7px 16px}
+  .em-bar{order:5;padding:7px 16px}
+  .stats-signal{order:6;padding:14px 16px}
   .days-metrics{order:7}
-  .donate-strip{order:8}
-  .vehicles-section{order:9}
-  .alert-strip{order:10}
-  .map-section{order:11}
-  .dealer-section{order:12}
-  .bottom-row{order:13}
-  .status-bar{order:14}
-  footer{order:15}
+  .chart-section{order:8;display:block;padding:12px 16px}
+  .donate-strip{order:9;padding:8px 16px}
+  .vehicles-section{order:10;padding:10px 16px}
+  .alert-strip{order:11}
+  .map-section{order:12;padding:10px 16px;display:block}
+  .dealer-section{order:13;padding:10px 16px}
+  .bottom-row{order:14;grid-template-columns:1fr}
+  .status-bar{order:15}
+  footer{order:16}
   .don-modal{order:99}
-  /* Friend bar — hide button, keep text */
-  .friend-bar .friend-btn{display:none}
-  /* Donate strip — compact on mobile */
-  .donate-strip{padding:6px 14px}
+
+  /* ── HEADER ── */
+  .logo-title{font-size:26px}
+  .logo-sub{font-size:8px}
+  .live-badge{font-size:8px;padding:4px 9px}
+
+  /* ── PRICE STRIP ── */
+  .pv{font-size:22px}
+  .pl{font-size:8px}
+
+  /* ── FRIEND / EM BAR ── */
+  .friend-bar .friend-btn{width:100%;text-align:center;margin-top:4px}
+  .friend-text{font-size:10px}
+  .em-btn{width:100%;text-align:center;margin-top:4px}
+  .em-text{font-size:10px}
+
+  /* ── STATS + SIGNAL ── */
+  .stats-signal{flex-direction:column;gap:4px;align-items:center;text-align:center}
+  .sn{font-size:72px;text-align:center;width:100%}
+  .sl{font-size:10px;letter-spacing:1px;text-align:center;width:100%}
+  .ss{font-size:12px;text-align:center}
+  .sig-divider{display:none}
+  .count-meta{align-items:center;width:100%}
+  .sig-wrap{min-width:100%;order:3}
+  .sig-ends{font-size:8px}
+  .sig-txt{font-size:12px;margin-top:6px}
+
+  /* ── DAYS METRICS ── */
+  .days-metrics{grid-template-columns:1fr 1fr;gap:1px;background:var(--border)}
+  .dm-item{background:var(--bg1);padding:10px 12px}
+  .dm-val{font-size:24px}
+  .dm-label{font-size:8px}
+  .dm-sep{display:none}
+
+  /* ── CHART — compact but visible ── */
+  .chart-section canvas{height:120px!important}
+  .cleg .cli{font-size:9px}
+
+  /* ── DONATE ── */
   .donate-strip-inner{gap:6px}
   .dt-label{font-size:12px}
-  .dt-raised{font-size:16px}
-  .amts{gap:3px}
-  .ab{padding:3px 7px;font-size:9px}
-  .dt-fields{flex-wrap:wrap}
-  .dt-input{min-width:0;flex:1;font-size:9px;padding:4px 7px}
+  .dt-raised{font-size:18px}
+  .amts{gap:3px;flex-wrap:wrap}
+  .ab{padding:4px 9px;font-size:10px}
+  .dt-fields{flex-direction:column;align-items:stretch}
   #dname,#dmsg{display:none}
-  .paybtn{width:100%;margin-top:2px;padding:8px}
+  .paybtn{width:100%;padding:10px;font-size:11px}
 
-  /* Signal bar — tighten */
-  .stats-signal{gap:12px}
-  .sig-divider{display:none}
-  .sig-wrap{min-width:100%;order:3}
+  /* ── VEHICLE TABLE ── */
+  .vr{grid-template-columns:72px 1fr auto auto;gap:6px;padding:10px 14px}
+  .vlink,.vvin,.vstat-cell,.vstat-hdr,.vh span:nth-child(1),.vh span:nth-child(5),.vh span:nth-child(6),.vbell{display:none}
+  .vh{grid-template-columns:72px 1fr auto auto}
+  .vtrim{font-size:9px;padding:2px 5px}
+  .vdeal{font-size:11px}
+  .vmsrp{font-size:18px}
+  .vdays{font-size:10px;color:var(--muted)}
+
+  /* ── MAP ── */
+  #raptorMap{height:260px}
+
+  /* ── DEALER TABLE ── */
+  .dealer-table th:last-child,.dt-bar-bg,.dt-miles{display:none}
+  .dt-row td{padding:7px 8px;font-size:11px}
+  .dt-count{font-size:20px}
+
+  /* ── ALERT STRIP ── */
+  .alert-strip{padding:8px 16px}
+  .alert-strip-inner{flex-direction:column;align-items:stretch;gap:6px}
+  .alert-select,.alert-input-sm,.alert-strip-btn{width:100%;font-size:11px;padding:8px 10px}
+
+  /* ── BOTTOM PANES ── */
+  .pane{padding:14px 16px}
+  .cq{font-size:11px}
+  .stbl td{font-size:10px}
 }
 
 .em-bar{background:#0a0800;border-bottom:1px solid #2a2000;padding:7px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
@@ -351,7 +396,7 @@ footer a:hover{color:var(--muted)}
 </div>
 
 <div class="friend-bar">
-  <span class="friend-text">Check out a friend's site: <a href="https://isoilabove100.com" target="_blank" rel="noopener">isoilabove100.com</a> — live WTI &amp; Brent crude prices</span>
+  <span class="friend-text">Check out <a href="https://x.com/Aubrey___K" target="_blank" rel="noopener">@Aubrey___K</a>'s website: <a href="https://isoilabove100.com" target="_blank" rel="noopener">isoilabove100.com</a> — live WTI &amp; Brent crude prices</span>
   <a class="friend-btn" href="https://isoilabove100.com" target="_blank" rel="noopener">IS OIL ABOVE $100? →</a>
 </div>
 
@@ -496,7 +541,7 @@ footer a:hover{color:var(--muted)}
   <div class="cleg">
     <div class="cli"><div class="cll" style="background:#f0a500"></div>Raptors in stock</div>
   </div>
-  <div style="position:relative;width:100%;height:160px">
+  <div style="position:relative;width:100%;height:160px" id="chartWrap">
     <canvas id="tC"></canvas>
   </div>
 </div>
@@ -975,6 +1020,9 @@ function renderDealerTable(){
 }
 
 function renderChart(){
+  const isMobile = window.innerWidth <= 680;
+  const wrap = document.getElementById('chartWrap');
+  if(wrap) wrap.style.height = isMobile ? '120px' : '160px';
   if(tc) tc.destroy();
   const labels=snaps.map(s=>{const d=new Date(s.snap_date+'T12:00:00');return(d.getMonth()+1)+'/'+d.getDate()});
   tc=new Chart(document.getElementById('tC'),{type:'line',
