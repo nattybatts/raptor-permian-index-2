@@ -6,7 +6,7 @@
 <title>Merch — Permian Raptor Index</title>
 <meta name="description" content="Official Permian Raptor Index merchandise. Hand-embroidered hats. West Texas made.">
 <meta property="og:title" content="Permian Raptor Index Merch">
-<meta property="og:description" content="Hand-embroidered hats. West Texas made. Patch the rig, cap the well.">
+<meta property="og:description" content="Hand-embroidered hats. West Texas made. Energy Loud. Energy Proud.">
 <meta property="og:image" content="https://i.imgur.com/DcbDZ8a.jpeg">
 <meta property="og:image:width" content="1344">
 <meta property="og:image:height" content="896">
@@ -15,7 +15,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://i.imgur.com/DcbDZ8a.jpeg">
 <meta name="twitter:title" content="Permian Raptor Index Merch">
-<meta name="twitter:description" content="Hand-embroidered hats. West Texas made. Patch the rig, cap the well.">
+<meta name="twitter:description" content="Hand-embroidered hats. West Texas made. Energy Loud. Energy Proud.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -60,12 +60,44 @@ nav{background:#120e00;border-bottom:2px solid var(--gold-dim);padding:12px 24px
 .product-info{padding:16px;flex:1;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--border)}
 .product-name{font-family:var(--display);font-size:22px;color:var(--text);letter-spacing:2px;line-height:1.1}
 .product-desc{font-size:10px;color:var(--muted);line-height:1.6}
-.product-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:12px}
-.product-price{font-family:var(--display);font-size:28px;color:var(--gold)}
+.product-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:12px;gap:10px}
+.product-price{font-family:var(--display);font-size:28px;color:var(--gold);flex-shrink:0}
 .product-price span{font-size:12px;color:var(--faint);font-family:var(--mono);margin-left:2px}
-.buy-btn{background:var(--gold-dim);border:none;color:#000;font-family:var(--mono);font-size:10px;font-weight:700;padding:9px 16px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:background .15s;white-space:nowrap}
-.buy-btn:hover{background:var(--gold)}
-.buy-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ADD TO CART BUTTON */
+.cart-btn{background:transparent;border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-size:10px;font-weight:700;padding:9px 14px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .15s;white-space:nowrap}
+.cart-btn:hover{background:var(--gold-dim);color:#000}
+.cart-btn.added{background:#1a2a0a;border-color:#4caf50;color:#4caf50}
+
+/* FLOATING CART */
+#cart-fab{position:fixed;bottom:24px;right:24px;z-index:1000;display:none;flex-direction:column;align-items:flex-end;gap:8px}
+#cart-fab.visible{display:flex}
+#cart-toggle{background:var(--gold);color:#000;border:none;font-family:var(--mono);font-size:11px;font-weight:700;padding:12px 18px;cursor:pointer;letter-spacing:1px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.6)}
+#cart-toggle:hover{background:#f5b800}
+#cart-count{background:#000;color:var(--gold);border-radius:50%;width:20px;height:20px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700}
+
+/* CART DRAWER */
+#cart-drawer{background:var(--bg1);border:1px solid var(--border2);width:320px;max-height:70vh;overflow-y:auto;display:none;flex-direction:column}
+#cart-drawer.open{display:flex}
+.cart-header{padding:12px 16px;border-bottom:1px solid var(--border);font-size:9px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.cart-header button{background:none;border:none;color:var(--faint);cursor:pointer;font-size:14px;padding:0}
+.cart-header button:hover{color:var(--muted)}
+.cart-items{flex:1;overflow-y:auto}
+.cart-item{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.cart-item-name{font-size:10px;color:var(--text);flex:1;line-height:1.4}
+.cart-item-price{font-size:10px;color:var(--gold);white-space:nowrap}
+.cart-qty{display:flex;align-items:center;gap:6px}
+.cart-qty button{background:var(--bg2);border:1px solid var(--border2);color:var(--text);width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center}
+.cart-qty button:hover{border-color:var(--gold-dim);color:var(--gold)}
+.cart-qty span{font-size:11px;min-width:16px;text-align:center}
+.cart-footer{padding:14px 16px;border-top:1px solid var(--border2)}
+.cart-total{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
+.cart-total-price{font-family:var(--display);font-size:22px;color:var(--gold);text-align:right;margin-bottom:12px}
+.cart-shipping-note{font-size:9px;color:var(--faint);letter-spacing:1px;margin-bottom:12px}
+.checkout-btn{width:100%;background:var(--gold-dim);border:none;color:#000;font-family:var(--mono);font-size:11px;font-weight:700;padding:12px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:background .15s}
+.checkout-btn:hover{background:var(--gold)}
+.checkout-btn:disabled{opacity:.4;cursor:not-allowed}
+.cart-empty{padding:24px 16px;font-size:10px;color:var(--faint);text-align:center;letter-spacing:1px}
 
 /* NOTES */
 .shop-notes{max-width:1100px;margin:0 auto;padding:24px 24px 48px;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border)}
@@ -92,6 +124,8 @@ footer a:hover{color:var(--muted)}
   .shop-notes{grid-template-columns:1fr}
   .nav{padding:10px 16px}
   .product-name{font-size:20px}
+  #cart-drawer{width:calc(100vw - 32px)}
+  #cart-fab{bottom:16px;right:16px}
 }
 </style>
 </head>
@@ -127,7 +161,7 @@ footer a:hover{color:var(--muted)}
         <div class="product-desc">Classic 6-panel structured cap. White embroidery on black. Raptor claw mark on side. Adjustable snapback.</div>
         <div class="product-bottom">
           <div class="product-price">$40<span>+ $8 shipping</span></div>
-          <button class="buy-btn" onclick="checkout('price_1TSO1NDICXtS1HCGpMMGr8qq','$100 Oil - Black Hat')">BUY NOW →</button>
+          <button class="cart-btn" onclick="addToCart('price_1TSO1NDICXtS1HCGpMMGr8qq','$100 Oil — Black Hat',40,this)">ADD TO CART</button>
         </div>
       </div>
     </div>
@@ -142,7 +176,7 @@ footer a:hover{color:var(--muted)}
         <div class="product-desc">Classic 6-panel structured cap. Black embroidery on white. Raptor claw mark on side. Adjustable snapback.</div>
         <div class="product-bottom">
           <div class="product-price">$40<span>+ $8 shipping</span></div>
-          <button class="buy-btn" onclick="checkout('price_1TSO1lDICXtS1HCGNbWpDSK1','$100 Oil - White Hat')">BUY NOW →</button>
+          <button class="cart-btn" onclick="addToCart('price_1TSO1lDICXtS1HCGNbWpDSK1','$100 Oil — White Hat',40,this)">ADD TO CART</button>
         </div>
       </div>
     </div>
@@ -157,7 +191,7 @@ footer a:hover{color:var(--muted)}
         <div class="product-desc">Mesh-back trucker with gold rope detail on brim. Gold embroidery on black. The premium pick. Snapback.</div>
         <div class="product-bottom">
           <div class="product-price">$50<span>+ $8 shipping</span></div>
-          <button class="buy-btn" onclick="checkout('price_1TSO5eDICXtS1HCGR1R6WzU8','$100 Oil - Black Trucker w/ Gold Rope')">BUY NOW →</button>
+          <button class="cart-btn" onclick="addToCart('price_1TSO5eDICXtS1HCGR1R6WzU8','$100 Oil — Black Trucker / Gold Rope',50,this)">ADD TO CART</button>
         </div>
       </div>
     </div>
@@ -172,7 +206,7 @@ footer a:hover{color:var(--muted)}
         <div class="product-desc">Mesh-back trucker with black rope detail on brim. Black embroidery on white. Clean and sharp. Snapback.</div>
         <div class="product-bottom">
           <div class="product-price">$50<span>+ $8 shipping</span></div>
-          <button class="buy-btn" onclick="checkout('price_1TSO8RDICXtS1HCGvPiQGGKQ','$100 Oil - White Trucker w/ Black Rope')">BUY NOW →</button>
+          <button class="cart-btn" onclick="addToCart('price_1TSO8RDICXtS1HCGvPiQGGKQ','$100 Oil — White Trucker / Black Rope',50,this)">ADD TO CART</button>
         </div>
       </div>
     </div>
@@ -187,7 +221,7 @@ footer a:hover{color:var(--muted)}
         <div class="product-desc">White mesh-back trucker. Black embroidery. For the hands who know what a diesel surcharge actually means. Snapback.</div>
         <div class="product-bottom">
           <div class="product-price">$40<span>+ $8 shipping</span></div>
-          <button class="buy-btn" onclick="checkout('price_1TSO80DICXtS1HCGpHEbD0vI','Diesel Surcharge')">BUY NOW →</button>
+          <button class="cart-btn" onclick="addToCart('price_1TSO80DICXtS1HCGpHEbD0vI','Diesel Surcharge',40,this)">ADD TO CART</button>
         </div>
       </div>
     </div>
@@ -219,8 +253,28 @@ footer a:hover{color:var(--muted)}
   <a href="/">← Back to the index</a>
 </footer>
 
+<!-- FLOATING CART -->
+<div id="cart-fab">
+  <div id="cart-drawer">
+    <div class="cart-header">
+      <span>CART</span>
+      <button onclick="toggleCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer" id="cartFooter"></div>
+  </div>
+  <button id="cart-toggle" onclick="toggleCart()">
+    🛒 CART <span id="cart-count">0</span>
+  </button>
+</div>
+
 <script>
 'use strict';
+
+// ── Cart state ──────────────────────────────────────────────
+// [{priceId, name, price, qty}]
+let cart = [];
+let drawerOpen = false;
 
 if(new URLSearchParams(location.search).get('success')==='1'){
   showMsg('ok','✓ Order placed! Check your email for confirmation. We\'ll be in touch when your hat ships.');
@@ -237,24 +291,111 @@ function showMsg(type, text){
   el.textContent = text;
 }
 
-async function checkout(priceId, productName){
-  const btns = document.querySelectorAll('.buy-btn');
-  btns.forEach(b=>b.disabled=true);
+// ── Add to cart ─────────────────────────────────────────────
+function addToCart(priceId, name, price, btn){
+  const existing = cart.find(i => i.priceId === priceId);
+  if(existing){
+    existing.qty++;
+  } else {
+    cart.push({ priceId, name, price, qty: 1 });
+  }
+
+  // Button flash
+  btn.textContent = '✓ ADDED';
+  btn.classList.add('added');
+  setTimeout(() => {
+    btn.textContent = 'ADD TO CART';
+    btn.classList.remove('added');
+  }, 1200);
+
+  renderCart();
+  openCart();
+}
+
+// ── Qty controls ────────────────────────────────────────────
+function changeQty(priceId, delta){
+  const item = cart.find(i => i.priceId === priceId);
+  if(!item) return;
+  item.qty += delta;
+  if(item.qty <= 0) cart = cart.filter(i => i.priceId !== priceId);
+  renderCart();
+}
+
+// ── Render ──────────────────────────────────────────────────
+function renderCart(){
+  const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+  const count = cart.reduce((s,i) => s + i.qty, 0);
+
+  // FAB visibility + count
+  const fab = document.getElementById('cart-fab');
+  fab.classList.toggle('visible', cart.length > 0);
+  document.getElementById('cart-count').textContent = count;
+
+  // Items
+  const itemsEl = document.getElementById('cartItems');
+  if(cart.length === 0){
+    itemsEl.innerHTML = '<div class="cart-empty">YOUR CART IS EMPTY</div>';
+  } else {
+    itemsEl.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-qty">
+          <button onclick="changeQty('${item.priceId}',-1)">−</button>
+          <span>${item.qty}</span>
+          <button onclick="changeQty('${item.priceId}',1)">+</button>
+        </div>
+        <div class="cart-item-price">$${item.price * item.qty}</div>
+      </div>
+    `).join('');
+  }
+
+  // Footer
+  const footerEl = document.getElementById('cartFooter');
+  if(cart.length === 0){
+    footerEl.innerHTML = '';
+  } else {
+    footerEl.innerHTML = `
+      <div class="cart-total"><span>SUBTOTAL</span><span>${count} item${count!==1?'s':''}</span></div>
+      <div class="cart-total-price">$${total} <span style="font-size:12px;color:var(--faint);font-family:var(--mono)">+ $8 shipping</span></div>
+      <div class="cart-shipping-note">FLAT $8 SHIPPING · SHIPS USPS · US ONLY</div>
+      <button class="checkout-btn" id="checkoutBtn" onclick="checkout()">CHECKOUT →</button>
+    `;
+  }
+}
+
+// ── Toggle drawer ────────────────────────────────────────────
+function openCart(){
+  drawerOpen = true;
+  document.getElementById('cart-drawer').classList.add('open');
+}
+function toggleCart(){
+  drawerOpen = !drawerOpen;
+  document.getElementById('cart-drawer').classList.toggle('open', drawerOpen);
+}
+
+// ── Checkout ─────────────────────────────────────────────────
+async function checkout(){
+  if(cart.length === 0) return;
+  const btn = document.getElementById('checkoutBtn');
+  if(btn) btn.disabled = true;
 
   try{
     const r = await fetch('/api/merch-checkout',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({priceId, productName})
+      body: JSON.stringify({ items: cart.map(i => ({ priceId: i.priceId, quantity: i.qty, productName: i.name })) })
     });
     const d = await r.json();
     if(d.url) window.location.href = d.url;
-    else throw new Error(d.error||'Checkout failed');
+    else throw new Error(d.error || 'Checkout failed');
   }catch(e){
     showMsg('err','Error: '+e.message);
-    btns.forEach(b=>b.disabled=false);
+    if(btn) btn.disabled = false;
   }
 }
+
+// Init render
+renderCart();
 </script>
 </body>
 </html>
