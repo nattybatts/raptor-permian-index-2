@@ -30,7 +30,8 @@ export default async function handler(req, res) {
         .order('donated_at', { ascending: false })
         .limit(20),
 
-      // Recently sold/delisted — inactive vehicles from last 60 days
+      // Recently inactive — vehicles not seen in last 60 days
+      // Note: we filter out dealer transfers below using active VIN cross-check
       supabase.from('vehicles')
         .select('vin, model_year, trim, color, msrp, dealer_name, dealer_city, engine_size, first_seen, last_seen, first_listed, days_on_lot, vehicle_url, dealer_url')
         .eq('active', false)
@@ -38,6 +39,10 @@ export default async function handler(req, res) {
         .order('last_seen', { ascending: false })
         .limit(50),
     ]);
+
+    // Cross-check: remove any "sold" VIN that is currently active (= dealer transfer, not a sale)
+    const activeVins = new Set((vehiclesRes.data || []).map(v => v.vin).filter(Boolean));
+    const recentlySold = (soldRes?.data || []).filter(v => !activeVins.has(v.vin));
 
     // Build dealer summary from active vehicles
     const dealerMap = new Map();
@@ -93,7 +98,7 @@ export default async function handler(req, res) {
         max:        maxDays,        // longest sitting truck currently
         sampleSize: allDays.length, // total vehicles used for rolling avg
       },
-      recentlySold:  soldRes?.data || [],
+      recentlySold,
       generatedAt: new Date().toISOString(),
     });
 
