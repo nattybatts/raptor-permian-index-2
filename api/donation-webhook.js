@@ -37,6 +37,13 @@ export default async function handler(req, res) {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
+
+    // Skip merch purchases — only record donations
+    if (session.metadata?.type !== 'donation') {
+      console.log(`Skipping non-donation checkout: type=${session.metadata?.type}`);
+      return res.status(200).json({ received: true });
+    }
+
     const amount  = session.amount_total || 0;
     const name    = session.metadata?.display_name || 'Anonymous';
     const message = session.metadata?.message      || null;

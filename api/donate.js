@@ -35,7 +35,7 @@ export default async function handler(req, res) {
         },
       },
     }],
-    metadata: { display_name: name, message },
+    metadata: { display_name: name, message, type: 'donation' },
     success_url: `${baseUrl}/?donated=1`,
     cancel_url:  `${baseUrl}/`,
   });

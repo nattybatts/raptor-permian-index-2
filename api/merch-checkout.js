@@ -35,6 +35,7 @@ export default async function handler(req, res) {
         'success_url': 'https://www.permianraptorindex.com/merch?success=1',
         'cancel_url':  'https://www.permianraptorindex.com/merch?canceled=1',
         'metadata[product_name]': productName || 'Hat',
+        'metadata[type]': 'merch',
         'payment_method_types[0]': 'card',
         'payment_method_types[1]': 'link',
       }),
