@@ -4,7 +4,11 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { priceId, productName } = req.body || {};
+  let body = req.body || {};
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body); } catch { body = {}; }
+  }
+  const { priceId, productName } = body;
   if (!priceId) return res.status(400).json({ error: 'Price ID required' });
 
   // Validate price ID is one of our known products
