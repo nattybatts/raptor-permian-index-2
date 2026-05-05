@@ -1,17 +1,18 @@
 // POST /api/merch-checkout
 // Creates a Stripe Checkout session for merch purchases
+// Body: { items: [{ priceId, quantity, productName }] }
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  let body = req.body || {};
-  if (typeof body === 'string') {
-    try { body = JSON.parse(body); } catch { body = {}; }
-  }
-  const { priceId, productName } = body;
-  if (!priceId) return res.status(400).json({ error: 'Price ID required' });
+  const body = req.body || {};
+  const items = body.items;
 
-  // Validate price ID is one of our known products
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ error: 'Price ID required' });
+  }
+
+  // Validate all price IDs are known products
   const validPrices = [
     'price_1TSO1NDICXtS1HCGpMMGr8qq', // Black Hat $40
     'price_1TSO1lDICXtS1HCGNbWpDSK1', // White Hat $40
@@ -19,11 +20,21 @@ export default async function handler(req, res) {
     'price_1TSO8RDICXtS1HCGvPiQGGKQ', // White Trucker Black $50
     'price_1TSO80DICXtS1HCGpHEbD0vI', // Diesel Surcharge $40
   ];
-  if (!validPrices.includes(priceId)) {
-    return res.status(400).json({ error: 'Invalid product' });
+
+  for (const item of items) {
+    if (!validPrices.includes(item.priceId)) {
+      return res.status(400).json({ error: 'Invalid product' });
+    }
   }
 
   try {
+    // Build line_items params for each cart item
+    const lineItemParams = {};
+    items.forEach((item, i) => {
+      lineItemParams[`line_items[${i}][price]`]    = item.priceId;
+      lineItemParams[`line_items[${i}][quantity]`] = String(item.quantity || 1);
+    });
+
     const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {
@@ -32,13 +43,11 @@ export default async function handler(req, res) {
       },
       body: new URLSearchParams({
         'mode': 'payment',
-        'line_items[0][price]': priceId,
-        'line_items[0][quantity]': '1',
+        ...lineItemParams,
         'shipping_address_collection[allowed_countries][0]': 'US',
         'shipping_options[0][shipping_rate]': 'shr_1TSO0bDICXtS1HCGASkhU929',
         'success_url': 'https://www.permianraptorindex.com/merch?success=1',
         'cancel_url':  'https://www.permianraptorindex.com/merch?canceled=1',
-        'metadata[product_name]': productName || 'Hat',
         // Automatic payment methods: enables whatever is toggled on in the
         // Stripe dashboard (card, Link, Affirm, Klarna, etc.) without
         // requiring code changes each time.
