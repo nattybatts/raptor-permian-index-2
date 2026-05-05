@@ -1,11 +1,13 @@
 // POST /api/merch-checkout
 // Creates a Stripe Checkout session for merch purchases
-// Accepts: { items: [{ priceId, quantity, productName }] }
-// Legacy single-item: { priceId, productName } also still works
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+  const { priceId, productName } = req.body || {};
+  if (!priceId) return res.status(400).json({ error: 'Price ID required' });
+
+  // Validate price ID is one of our known products
   const validPrices = [
     'price_1TSO1NDICXtS1HCGpMMGr8qq', // Black Hat $40
     'price_1TSO1lDICXtS1HCGNbWpDSK1', // White Hat $40
@@ -13,53 +15,31 @@ export default async function handler(req, res) {
     'price_1TSO8RDICXtS1HCGvPiQGGKQ', // White Trucker Black $50
     'price_1TSO80DICXtS1HCGpHEbD0vI', // Diesel Surcharge $40
   ];
-
-  // Normalise to items array (support legacy single-item calls too)
-  let items = [];
-  if (req.body?.items) {
-    items = req.body.items;
-  } else if (req.body?.priceId) {
-    items = [{ priceId: req.body.priceId, quantity: 1, productName: req.body.productName }];
-  }
-
-  if (!items.length) return res.status(400).json({ error: 'No items in cart' });
-
-  // Validate all price IDs
-  for (const item of items) {
-    if (!validPrices.includes(item.priceId)) {
-      return res.status(400).json({ error: `Invalid product: ${item.priceId}` });
-    }
-    if (!Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 10) {
-      return res.status(400).json({ error: 'Quantity must be between 1 and 10' });
-    }
+  if (!validPrices.includes(priceId)) {
+    return res.status(400).json({ error: 'Invalid product' });
   }
 
   try {
-    const params = new URLSearchParams({
-      'mode': 'payment',
-      'shipping_address_collection[allowed_countries][0]': 'US',
-      'shipping_options[0][shipping_rate]': 'shr_1TSO0bDICXtS1HCGASkhU929',
-      'success_url': 'https://www.permianraptorindex.com/merch?success=1',
-      'cancel_url':  'https://www.permianraptorindex.com/merch?canceled=1',
-      'metadata[type]': 'merch',
-      'metadata[product_names]': items.map(i => `${i.quantity}x ${i.productName || i.priceId}`).join(', '),
-      'payment_method_types[0]': 'card',
-      'payment_method_types[1]': 'link',
-    });
-
-    // Add line items
-    items.forEach((item, i) => {
-      params.set(`line_items[${i}][price]`, item.priceId);
-      params.set(`line_items[${i}][quantity]`, String(item.quantity));
-    });
-
     const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: params,
+      body: new URLSearchParams({
+        'mode': 'payment',
+        'line_items[0][price]': priceId,
+        'line_items[0][quantity]': '1',
+        'shipping_address_collection[allowed_countries][0]': 'US',
+        'shipping_options[0][shipping_rate]': 'shr_1TSO0bDICXtS1HCGASkhU929',
+        'success_url': 'https://www.permianraptorindex.com/merch?success=1',
+        'cancel_url':  'https://www.permianraptorindex.com/merch?canceled=1',
+        'metadata[product_name]': productName || 'Hat',
+        // Automatic payment methods: enables whatever is toggled on in the
+        // Stripe dashboard (card, Link, Affirm, Klarna, etc.) without
+        // requiring code changes each time.
+        'automatic_payment_methods[enabled]': 'true',
+      }),
     });
 
     const session = await r.json();
