@@ -13,8 +13,8 @@ export default async function handler(req, res) {
   const name    = (body?.display_name || 'Anonymous').slice(0, 60);
   const message = (body?.message      || '').slice(0, 140);
 
-  if (!amount || amount < 100 || amount > 50000) {
-    return res.status(400).json({ error: 'Amount must be between $1 and $500' });
+  if (!amount || amount < 100 || amount > 500000) {
+    return res.status(400).json({ error: 'Amount must be between $1 and $5,000' });
   }
 
   const { default: Stripe } = await import('stripe');
