@@ -48,10 +48,8 @@ export default async function handler(req, res) {
         'shipping_options[0][shipping_rate]': 'shr_1TSO0bDICXtS1HCGASkhU929',
         'success_url': 'https://www.permianraptorindex.com/merch?success=1',
         'cancel_url':  'https://www.permianraptorindex.com/merch?canceled=1',
-        // Automatic payment methods: enables whatever is toggled on in the
-        // Stripe dashboard (card, Link, Affirm, Klarna, etc.) without
-        // requiring code changes each time.
-        'automatic_payment_methods[enabled]': 'true',
+        'payment_method_types[0]': 'card',
+        'payment_method_types[1]': 'affirm',
       }),
     });
 
