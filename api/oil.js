@@ -21,7 +21,9 @@ export default async function handler(req, res) {
       if (r.ok) {
         const j = await r.json();
         const price = j?.data?.price ? parseFloat(j.data.price) : null;
-        if (price && price > 10) {
+        // Sanity check: WTI spot should realistically be between $20-$150
+        // Rejects stale futures prices or clearly bad data from the free tier
+        if (price && price > 20 && price < 150) {
           return res.status(200).json({ price, source: 'oilpriceapi' });
         }
       }
@@ -36,7 +38,8 @@ export default async function handler(req, res) {
       if (r.ok) {
         const j = await r.json();
         const price = j?.response?.data?.[0]?.value ? parseFloat(j.response.data[0].value) : null;
-        if (price && price > 10) {
+        // Same sanity check on EIA data
+        if (price && price > 20 && price < 150) {
           return res.status(200).json({ price, source: 'eia' });
         }
       }
