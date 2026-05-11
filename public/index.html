@@ -796,28 +796,17 @@ async function loadData(){
   }
 }
 
-// Live oil price — throttled to once per 15 min via localStorage
-const OIL_KEY='wti_last_fetch', OIL_TTL=15*60*1000;
-// If the API's own fetched_at is older than this, treat it as stale and ignore the localStorage throttle
-const OIL_MAX_AGE=30*60*1000;
+// Live oil price -- fetched on every page load.
+// Rate limiting is handled by the edge cache (s-maxage=600) in api/oil.js,
+// so upstream APIs are not hammered even with many concurrent visitors.
 async function fetchLiveOil(){
-  const last=parseInt(localStorage.getItem(OIL_KEY)||'0');
-  if(Date.now()-last<OIL_TTL) return;
   try{
     const r=await fetch('/api/oil');
     if(!r.ok) return;
     const d=await r.json();
     if(!d.price||d.price<10) return;
-    // If the server's own fetched_at is stale (edge cache stuck), clear our
-    // localStorage throttle so we retry on the next page load rather than
-    // treating a stale price as fresh for another 15 minutes.
-    if(d.fetched_at && Date.now()-d.fetched_at > OIL_MAX_AGE){
-      localStorage.removeItem(OIL_KEY);
-      return;
-    }
     document.getElementById('wtiV').textContent='$'+d.price.toFixed(2);
     document.getElementById('brtV').textContent='$'+(d.price+2.5).toFixed(2);
-    localStorage.setItem(OIL_KEY,String(Date.now()));
   }catch{}
 }
 
