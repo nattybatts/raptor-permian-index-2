@@ -46,6 +46,7 @@ export default async function handler(req, res) {
         'cancel_url':  'https://www.permianraptorindex.com/merch?canceled=1',
         'payment_method_types[0]': 'card',
         'payment_method_types[1]': 'affirm',
+        'allow_promotion_codes': 'true',
       }),
     });
 
