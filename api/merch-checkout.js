@@ -14,11 +14,7 @@ export default async function handler(req, res) {
 
   // Validate all price IDs are known products
   const validPrices = [
-    'price_1TSO1NDICXtS1HCGpMMGr8qq', // Black Hat $40
-    'price_1TSO1lDICXtS1HCGNbWpDSK1', // White Hat $40
-    'price_1TSO5eDICXtS1HCGR1R6WzU8', // Black Trucker Gold $50
-    'price_1TSO8RDICXtS1HCGvPiQGGKQ', // White Trucker Black $50
-    'price_1TSO80DICXtS1HCGpHEbD0vI', // Diesel Surcharge $40
+    'price_1TW1HiDICXtS1HCGkHNfRChb', // Black Trucker Gold $45
   ];
 
   for (const item of items) {
