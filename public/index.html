@@ -774,11 +774,10 @@ async function loadData(){
     const ds=new Date(l.snap_date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
     document.getElementById('asOf').textContent=ds;
 
-    // Set oil price from Supabase as initial value
+    // Set WTI from Supabase as initial value; Brent left as — until fetchLiveOil() returns real data
     if(l.wti_price){
       const p=parseFloat(l.wti_price);
       document.getElementById('wtiV').textContent='$'+p.toFixed(2);
-      document.getElementById('brtV').textContent='$'+(p+2.5).toFixed(2);
     }
 
     if(l.commentary) document.getElementById('fNotes').textContent='"'+l.commentary+'"';
@@ -806,7 +805,7 @@ async function fetchLiveOil(){
     const d=await r.json();
     if(!d.price||d.price<10) return;
     document.getElementById('wtiV').textContent='$'+d.price.toFixed(2);
-    document.getElementById('brtV').textContent='$'+(d.price+2.5).toFixed(2);
+    if(d.brent&&d.brent>10) document.getElementById('brtV').textContent='$'+d.brent.toFixed(2);
   }catch{}
 }
 
