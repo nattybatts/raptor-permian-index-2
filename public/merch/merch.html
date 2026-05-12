@@ -182,7 +182,7 @@ footer a:hover{color:var(–muted)}
   <div class="note">
     <div class="note-icon">📦</div>
     <div class="note-title">Ships USPS</div>
-    <div class="note-text">Ships anywhere in the US via USPS First Class. Tracking provided. $8 flat shipping per order.</div>
+    <div class="note-text">Ships anywhere in the US via USPS First Class. Tracking provided. Free shipping on every order.</div>
   </div>
   <div class="note">
     <div class="note-icon">🤙</div>
@@ -301,8 +301,8 @@ function renderCart(){
   } else {
     footerEl.innerHTML = `
       <div class="cart-total"><span>SUBTOTAL</span><span>${count} item${count!==1?'s':''}</span></div>
-      <div class="cart-total-price">$${total} <span style="font-size:12px;color:var(--faint);font-family:var(--mono)">+ $8 shipping</span></div>
-      <div class="cart-shipping-note">FLAT $8 SHIPPING · SHIPS USPS · US ONLY</div>
+      <div class="cart-total-price">$${total} <span style="font-size:12px;color:var(--faint);font-family:var(--mono)">free shipping</span></div>
+      <div class="cart-shipping-note">FREE SHIPPING · SHIPS USPS · US ONLY</div>
       <button class="checkout-btn" id="checkoutBtn" onclick="checkout()">CHECKOUT →</button>
     `;
   }
