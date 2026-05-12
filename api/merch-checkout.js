@@ -39,17 +39,9 @@ const session = await stripe.checkout.sessions.create({
   shipping_address_collection: {
     allowed_countries: ['US'],
   },
-  shipping_options: [{
-    shipping_rate_data: {
-      type: 'fixed_amount',
-      fixed_amount: { amount: 0, currency: 'usd' },
-      display_name: 'Free Shipping',
-      delivery_estimate: {
-        minimum: { unit: 'business_day', value: 7 },
-        maximum: { unit: 'business_day', value: 14 },
-      },
-    },
-  }],
+  shipping_options: [
+    { shipping_rate: 'shr_1TWIGyDICXtS1HCGCYJsazDl' },
+  ],
   success_url: 'https://www.permianraptorindex.com/merch?success=1',
   cancel_url:  'https://www.permianraptorindex.com/merch?canceled=1',
 });
