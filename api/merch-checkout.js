@@ -1,13 +1,22 @@
 // POST /api/merch-checkout
+// Creates a Stripe Checkout session for merch purchases
+// Body: { items: [{ priceId, quantity, productName }] }
+
 export default async function handler(req, res) {
 if (req.method !== ‘POST’) return res.status(405).json({ error: ‘Method not allowed’ });
 
-const items = (req.body || {}).items;
+const body = req.body || {};
+const items = body.items;
+
 if (!items || !Array.isArray(items) || items.length === 0) {
 return res.status(400).json({ error: ‘Price ID required’ });
 }
 
-const validPrices = [‘price_1TW1HiDICXtS1HCGkHNfRChb’];
+// Validate all price IDs are known products
+const validPrices = [
+‘price_1TW1HiDICXtS1HCGkHNfRChb’, // Black Trucker Gold $45
+];
+
 for (const item of items) {
 if (!validPrices.includes(item.priceId)) {
 return res.status(400).json({ error: ‘Invalid product’ });
@@ -15,6 +24,7 @@ return res.status(400).json({ error: ‘Invalid product’ });
 }
 
 try {
+// Build line_items params for each cart item
 const lineItemParams = {};
 items.forEach((item, i) => {
 lineItemParams[`line_items[${i}][price]`]    = item.priceId;
@@ -33,16 +43,22 @@ const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
     ...lineItemParams,
     'success_url': 'https://www.permianraptorindex.com/merch?success=1',
     'cancel_url':  'https://www.permianraptorindex.com/merch?canceled=1',
+    'payment_method_types[0]': 'card',
+    'payment_method_types[1]': 'affirm',
   }),
 });
 
 const session = await r.json();
-// Return the FULL Stripe error so we can see exactly what it rejects
-if (!r.ok) return res.status(500).json({ error: session.error?.message, code: session.error?.code, param: session.error?.param });
+if (!r.ok) {
+  console.error('[merch-checkout] Stripe error:', session);
+  return res.status(500).json({ error: session.error?.message || 'Stripe error' });
+}
+
 return res.status(200).json({ url: session.url });
 ```
 
 } catch (err) {
+console.error(’[merch-checkout] error:’, err.message);
 return res.status(500).json({ error: err.message });
 }
 }
