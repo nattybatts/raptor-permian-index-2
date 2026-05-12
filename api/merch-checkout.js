@@ -37,7 +37,8 @@ const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
 });
 
 const session = await r.json();
-if (!r.ok) return res.status(500).json({ error: session.error?.message || 'Stripe error' });
+// Return the FULL Stripe error so we can see exactly what it rejects
+if (!r.ok) return res.status(500).json({ error: session.error?.message, code: session.error?.code, param: session.error?.param });
 return res.status(200).json({ url: session.url });
 ```
 
