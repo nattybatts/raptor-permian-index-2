@@ -11,7 +11,6 @@ const items = body.items;
 if (!items || !Array.isArray(items) || items.length === 0) {
 return res.status(400).json({ error: ‘Price ID required’ });
 }
-
 // Validate all price IDs are known products
 const validPrices = [
 ‘price_1TW1HiDICXtS1HCGkHNfRChb’, // Black Trucker Gold $45
