@@ -1,21 +1,13 @@
 // POST /api/merch-checkout
-// Creates a Stripe Checkout session for merch purchases
-// Body: { items: [{ priceId, quantity, productName }] }
-
 export default async function handler(req, res) {
 if (req.method !== ‘POST’) return res.status(405).json({ error: ‘Method not allowed’ });
 
-const body = req.body || {};
-const items = body.items;
-
+const items = (req.body || {}).items;
 if (!items || !Array.isArray(items) || items.length === 0) {
 return res.status(400).json({ error: ‘Price ID required’ });
 }
 
-const validPrices = [
-‘price_1TW1HiDICXtS1HCGkHNfRChb’, // Black Trucker Gold $45
-];
-
+const validPrices = [‘price_1TW1HiDICXtS1HCGkHNfRChb’];
 for (const item of items) {
 if (!validPrices.includes(item.priceId)) {
 return res.status(400).json({ error: ‘Invalid product’ });
@@ -39,8 +31,6 @@ const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
   body: new URLSearchParams({
     'mode': 'payment',
     ...lineItemParams,
-    'shipping_address_collection[allowed_countries][0]': 'US',
-    'shipping_options[0][shipping_rate]': 'shr_1TWIGyDICXtS1HCGCYJsazDl',
     'allow_promotion_codes': 'true',
     'success_url': 'https://www.permianraptorindex.com/merch?success=1',
     'cancel_url':  'https://www.permianraptorindex.com/merch?canceled=1',
@@ -48,16 +38,11 @@ const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
 });
 
 const session = await r.json();
-if (!r.ok) {
-  console.error('[merch-checkout] Stripe error:', JSON.stringify(session));
-  return res.status(500).json({ error: session.error?.message || 'Stripe error' });
-}
-
+if (!r.ok) return res.status(500).json({ error: session.error?.message || 'Stripe error' });
 return res.status(200).json({ url: session.url });
 ```
 
 } catch (err) {
-console.error(’[merch-checkout] crash:’, err.message);
 return res.status(500).json({ error: err.message });
 }
 }
