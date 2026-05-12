@@ -30,18 +30,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 ```
 const session = await stripe.checkout.sessions.create({
   mode: 'payment',
-  payment_method_types: ['card', 'affirm'],
-  allow_promotion_codes: true,
-  line_items: items.map(item => ({
-    price: item.priceId,
-    quantity: item.quantity || 1,
-  })),
+  // Let Stripe automatically determine available payment methods
+  // rather than explicitly listing them — avoids errors from
+  // methods not enabled on the account (e.g. affirm)
   shipping_address_collection: {
     allowed_countries: ['US'],
   },
   shipping_options: [
     { shipping_rate: 'shr_1TWIGyDICXtS1HCGCYJsazDl' },
   ],
+  allow_promotion_codes: true,
+  line_items: items.map(item => ({
+    price: item.priceId,
+    quantity: item.quantity || 1,
+  })),
   success_url: 'https://www.permianraptorindex.com/merch?success=1',
   cancel_url:  'https://www.permianraptorindex.com/merch?canceled=1',
 });
