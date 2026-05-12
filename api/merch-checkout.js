@@ -31,7 +31,6 @@ const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
   body: new URLSearchParams({
     'mode': 'payment',
     ...lineItemParams,
-    'allow_promotion_codes': 'true',
     'success_url': 'https://www.permianraptorindex.com/merch?success=1',
     'cancel_url':  'https://www.permianraptorindex.com/merch?canceled=1',
   }),
