@@ -40,6 +40,7 @@ const r = await fetch('https://api.stripe.com/v1/checkout/sessions', {
     'mode': 'payment',
     ...lineItemParams,
     'shipping_address_collection[allowed_countries][0]': 'US',
+    'shipping_options[0][shipping_rate]': 'shr_1TWIGyDICXtS1HCGCYJsazDl',
     'success_url': 'https://www.permianraptorindex.com/merch?success=1',
     'cancel_url':  'https://www.permianraptorindex.com/merch?canceled=1',
     'payment_method_types[0]': 'card',
@@ -54,6 +55,7 @@ if (!r.ok) {
 }
 
 return res.status(200).json({ url: session.url });
+
 
 } catch (err) {
 console.error(’[merch-checkout] error:’, err.message);
